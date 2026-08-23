@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# run
+unset JAVA_HOME
+exec ./build/install/cmsc124-birondo-melicor/bin/cmsc124-birondo-melicor "$@"
