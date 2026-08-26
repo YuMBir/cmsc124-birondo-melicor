@@ -1,0 +1,5 @@
+{
+    "ext": ".spell",
+    "mode": "sidecar",
+    "run_entrypoint": "./run"
+}
