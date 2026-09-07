@@ -7,8 +7,7 @@
 
 ## Overview
 
-[One paragraph: what the language is for, who would use it, what writing it
-feels like.]
+Atelier is a programming language designed for sorcerers, wizards, and other spellcasters that wish to experiment on their arcane innovations without the risk of permanently damaging the arcane weave itself should their spells go wrong. The language acts like the virtual arcane weave, producing at output that shows what would happen should they actually cast the spell they wrote. It uses terms and concepts mages would be familiar with in their day-to-day work. 
 
 ## Host language and build
 
@@ -33,7 +32,8 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 
 ## File extension
 
-`[.ext]` [Must match the `ext` field in every tests/lab*/manifest.json.]
+`[.spell]`  
+*Just like a page in your spellbook*
 
 ## Lexical structure
 
