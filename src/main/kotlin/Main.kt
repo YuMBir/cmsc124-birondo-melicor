@@ -15,19 +15,48 @@ fun main(args: Array<String>) {
     val source = try { //source contains the string
         Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
     } catch (error: Exception) {
-        fail("cannot read '$path': ${error.message}")
+        when (path){
+            "--tokenizer" -> tokenize(scan(args[1]))
+            else -> fail("$path is an invalid flag")
+        }
     }
 
-    System.out.write(source.toByteArray(StandardCharsets.UTF_8))//prints raw data in console
+}
+fun scan(path: String): String{
+    val source = try { //source contains the string
+        Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
+    } catch (error: Exception) {
+        fail("cannot read '$path': ${error.message}")
+    }
+    return source
+}
 
-}
-fun tokenScan(source: String){
-    TODO()
+fun tokenize(code: String){
+    val chars = code.toCharArray()
+    var line = 1
+    var tokens = mutableListOf<Token>()
+    for (char in chars){
+        var type = "NULL"
+        when (char){
+            '=' -> type = "EQUALS"
+            '(' -> type = "LEFT_PAREN"
+            ')' -> type = "RIGHT_PAREN"
+            '{' -> type = "LEFT_BRACE"
+            '}' -> type = "RIGHT_BRACE"
+            ':' -> type = "COLON"
+            '\n' -> line++
+            else -> type = "NULL"
+        }
+        if (type != "NULL"){
+            val newToken = Token(type, char.toString(), line)
+            tokens.add(newToken)
+        }
+    }
+    for (token in tokens){
+        println(token)
+    }
 }
 
-data class Token(val type: TokenType, val lexeme: String, val literal: Any?, val line: Int){
-    TODO()
-    //prints the output
-}
+data class Token(val type: String, val lexeme: String, val line: Int)
 
 
