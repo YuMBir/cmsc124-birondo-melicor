@@ -1,0 +1,5 @@
+{
+  "ext": ".spell",
+  "flag": "--tokenize",
+  "mode": "sidecar"
+}
