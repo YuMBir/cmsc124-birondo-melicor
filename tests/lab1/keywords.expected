@@ -1,0 +1,6 @@
+Token(type=EQUALS, lexeme==, line=1)
+Token(type=LEFT_PAREN, lexeme=(, line=1)
+Token(type=RIGHT_PAREN, lexeme=), line=1)
+Token(type=LEFT_BRACE, lexeme={, line=2)
+Token(type=RIGHT_BRACE, lexeme=}, line=2)
+Token(type=COLON, lexeme=:, line=2)
