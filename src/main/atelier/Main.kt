@@ -5,8 +5,8 @@ import java.nio.file.Path
 import kotlin.system.exitProcess
 
 
-internal fun fail(message: String): Nothing {
-    System.err.println("lab0: $message")
+private fun fail(message: String): Nothing {
+    System.err.println("Main: $message")
     exitProcess(65)
 }
 
