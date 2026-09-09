@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
         Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
     } catch (error: Exception) {
         when (path){
-            "--tokenizer" -> tokenize(scan(args[1]))
+            "--tokenize" -> tokenize(scan(args[1]))
             else -> fail("$path is an invalid flag")
         }
     }
@@ -52,11 +52,18 @@ fun tokenize(code: String){
             tokens.add(newToken)
         }
     }
+
+    // token output
     for (token in tokens){
-        println(token)
+        System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
     }
 }
 
-data class Token(val type: String, val lexeme: String, val line: Int)
+data class Token(val type: String, val lexeme: String, val line: Int){
+    override fun toString(): String {
+        //custom tokenize output format
+        return "(type=$type, lexeme=$lexeme, line=$line)\n"
+    }
+}
 
 
