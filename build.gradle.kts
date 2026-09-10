@@ -12,5 +12,9 @@ kotlin {
 }
 
 application {
-    mainClass = "MainKt"
+    mainClass = "atelier.MainKt"
+}
+//for using custom source path
+sourceSets.main {
+    kotlin.srcDirs("src/main/atelier")
 }
