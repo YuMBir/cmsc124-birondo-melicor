@@ -1,36 +1,5 @@
 package atelier
-
-import java.nio.charset.StandardCharsets
-
-//write token printer here
-fun tokenize(code: String){
-    val chars = code.toCharArray()
-    var line = 1
-    var tokens = mutableListOf<Token>()
-    for (char in chars){
-        var type = "NULL"
-        when (char){
-            '=' -> type = "EQUALS"
-            '(' -> type = "LEFT_PAREN"
-            ')' -> type = "RIGHT_PAREN"
-            '{' -> type = "LEFT_BRACE"
-            '}' -> type = "RIGHT_BRACE"
-            ':' -> type = "COLON"
-            '\n' -> line++
-            else -> type = "NULL"
-        }
-        if (type != "NULL"){
-            val newToken = Token(type, char.toString(), line)
-            tokens.add(newToken)
-        }
-    }
-
-    // token output
-    for (token in tokens){
-        System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
-    }
-}
-
+//token template
 data class Token(val type: String, val lexeme: String, val line: Int){
     override fun toString(): String {
         //custom tokenize output format
