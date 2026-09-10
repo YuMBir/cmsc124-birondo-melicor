@@ -29,7 +29,6 @@ fun main(args: Array<String>) {
 //main controller
 fun run(path: String, mode: String = "--print") {
     val atelierScanner = Scanner(path)
-    atelierScanner.tokenize() //run tokenizer
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
         "--tokenize" -> atelierScanner.printTokens()

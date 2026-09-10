@@ -23,7 +23,7 @@ class Scanner(path: String) {
         System.out.write(source.toByteArray(StandardCharsets.UTF_8))
     }
     //write token scanner here
-    fun tokenize(){
+    init {
         val chars = source.toCharArray()
         var line = 1
 
