@@ -71,7 +71,6 @@ class Scanner(path: String) {
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
     private fun string(){
         while (peek()!= '"' && !isAtEnd()){
-            if (peek() == '\n') line++ 
             advance()
         }
         if (isAtEnd()) {
