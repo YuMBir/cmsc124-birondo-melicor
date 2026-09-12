@@ -24,6 +24,9 @@ class Scanner(path: String) {
     }
     //write token scanner here
     init {
+        tokenize()
+    }
+    fun tokenize(){
         val chars = source.toCharArray()
         var line = 1
 
@@ -45,6 +48,7 @@ class Scanner(path: String) {
             }
         }
     }
+
     fun printTokens(){
         // token output
         for (token in tokens){
