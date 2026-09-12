@@ -1,5 +1,8 @@
 package atelier
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.system.exitProcess
 
 
@@ -20,6 +23,9 @@ fun main(args: Array<String>) {
             //print
             run(args[0])
         }
+        0 -> {
+            repl()
+        }
         else -> {
             fail("invalid no. of arguments")
         }
@@ -35,5 +41,17 @@ fun run(path: String, mode: String = "--print") {
         else -> fail("invalid flag")
     }
 
+}
+fun scanCode(path: String){
+    val source: String = try { //source contains the string
+        Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
+    } catch (error: Exception) {
+        fail("cannot read '$path': ${error.message}")
+    }
+}
+
+//REPL
+fun repl(){
+    TODO()
 }
 

@@ -11,13 +11,8 @@ private fun fail(message: String): Nothing {
 }
 
 //scanner class so that we don't have to keep passing values
-class Scanner(path: String) {
+class Scanner(val source: String) {
     var tokens = mutableListOf<Token>()
-    val source: String = try { //source contains the string
-        Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
-    } catch (error: Exception) {
-        fail("cannot read '$path': ${error.message}")
-    }
 
     fun printCode(){ //just prints the code in the file line by line
         System.out.write(source.toByteArray(StandardCharsets.UTF_8))
