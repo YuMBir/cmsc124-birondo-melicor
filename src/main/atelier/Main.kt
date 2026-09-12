@@ -17,11 +17,11 @@ fun main(args: Array<String>) {
     when (argsSize) {
         2 -> {
             //run with mode
-            run(args[1], args[0])
+            run(scanCode(args[1]), args[0])
         }
         1 -> {
             //print
-            run(args[0])
+            run(scanCode(args[0]))
         }
         0 -> {
             repl()
@@ -33,8 +33,8 @@ fun main(args: Array<String>) {
 }
 
 //main controller
-fun run(path: String, mode: String = "--print") {
-    val atelierScanner = Scanner(path)
+fun run(source: String, mode: String = "--print") {
+    val atelierScanner = Scanner(source)
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
         "--tokenize" -> atelierScanner.printTokens()
@@ -42,12 +42,13 @@ fun run(path: String, mode: String = "--print") {
     }
 
 }
-fun scanCode(path: String){
+fun scanCode(path: String): String{
     val source: String = try { //source contains the string
         Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
     } catch (error: Exception) {
         fail("cannot read '$path': ${error.message}")
     }
+    return source
 }
 
 //REPL
