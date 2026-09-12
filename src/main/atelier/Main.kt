@@ -53,6 +53,22 @@ fun scanCode(path: String): String{
 
 //REPL
 fun repl(){
-    TODO()
+    val limit = 200
+    var lineNo = 1
+    do  {
+        val line: String? = readLine()
+        //exits repl if empty string
+        if (!line.isNullOrEmpty()) {
+            val atelierScanner = Scanner(line)
+            //need to update token function so it knows what line it's in
+            atelierScanner.printTokens()
+        }
+        else{
+            System.out.write("Exited REPL".toByteArray(StandardCharsets.UTF_8))
+            exitProcess(0)
+        }
+        lineNo++
+    } while (lineNo < limit)
+
 }
 
