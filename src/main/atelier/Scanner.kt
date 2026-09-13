@@ -18,46 +18,137 @@ class Scanner(path: String) {
     } catch (error: Exception) {
         fail("cannot read '$path': ${error.message}")
     }
+    
+    private var start = 0 //index indicates present lexeme 
+    private var current = 0 //index indicating how far the file is read
+    private var line = 1
+
+    var hadError = false
+        private set 
+
+    private val keywords = mapOf( 
+        "var" to "VAR",
+        "print" to "PRINT"
+    )
+
+    
+    private fun isAtEnd() = current >= source.length //checks for file ending 
+    private fun advance(): Char { //consumes the character
+        val c = source[current++]
+        if (c == '\n') {
+            line++
+        }
+        return c
+    }
+    //reads a character that isn't consumed yet, in other words, it implements lookahead
+    private fun peek(): Char = if (isAtEnd()) '\u0000' else source[current]
+    private fun match(expected: Char): Boolean { 
+        if (isAtEnd() || source[current] != expected ) return false  //no character left or next character is not the expected character
+        current++
+        return true //consumes a match
+    }
+    private fun addToken(type: String, literal: Any? = null) {
+        val text = source.substring(start,current)
+        tokens.add(Token(type,text,literal,line))
+    }
+    private fun isDigit(c: Char) = c in '0'..'9' //checks if the character is a number/digit
+    private fun isAlpha(c: Char) = c in 'a'..'z' || c in 'A'..'Z' || c == '_' //checks if the character is alphabet
+    private fun isAlphaNumeric(c: Char) = isAlpha(c) || isDigit(c) //checks if character or number, for cases such as var1
+    private fun identifier() {
+        while (isAlphaNumeric(peek())) advance() //looks through whole identifier
+        val text = source.substring(start, current) //identifier text
+        addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
+    }
+    private fun number() { //this is for dealing with numbers
+        while (isDigit(peek())) advance()// handles decimal point
+        if (peek() == '.' && isDigit(peekNext())) { //if decimal poimt 
+            advance() // consume the '.'
+            while (isDigit(peek())) advance()
+        }
+        val value = source.substring(start, current)
+        addToken("NUMBER", value.toDouble())
+    }
+    private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
+    private fun string(){
+        while (peek()!= '"' && !isAtEnd()){
+            advance()
+        }
+        if (isAtEnd()) {
+            reportError(line, "Unterminated string.")
+            return
+        }
+        advance()   // consume the closing "
+
+        val value = source.substring(start + 1, current - 1)   // strip surrounding quotes
+        addToken("STRING", value)
+        }
+        private fun reportError(line: Int, message: String) {
+        hadError = true
+        System.err.println("[line $line] Error: $message")
+    }
+
+
 
     fun printCode(){ //just prints the code in the file line by line
         System.out.write(source.toByteArray(StandardCharsets.UTF_8))
     }
-    //write token scanner here
-    init {
-        tokenize()
-    }
-    fun tokenize(){
-        val chars = source.toCharArray()
-        var line = 1
 
-        for (char in chars){ //CHANGE THIS FOR prog check 2
-            var type = "NULL"
-            when (char){
-                '=' -> type = "EQUALS"
-                '(' -> type = "LEFT_PAREN"
-                ')' -> type = "RIGHT_PAREN"
-                '{' -> type = "LEFT_BRACE"
-                '}' -> type = "RIGHT_BRACE"
-                ':' -> type = "COLON"
-                '\n' -> line++
-                else -> type = "NULL"
+    //write token scanner here
+    fun tokenize(){
+        while (!isAtEnd()){
+            start = current
+            scanToken()
+        }
+        tokens.add(Token("EOF", "", line = line))
+    }
+    init { //pwede man ilagay dito ang code inside sang tokenize
+        tokenize() 
+    }
+  
+    private fun scanToken(){ //hindi ko gin enum class
+        when (val c = advance()){
+           '(' -> addToken("LEFT_PAREN")
+            ')' -> addToken("RIGHT_PAREN")
+            '{' -> addToken("LEFT_BRACE")
+            '}' -> addToken("RIGHT_BRACE")
+            ':' -> addToken("COLON")
+            '.' -> addToken("DOT")
+            '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
+            '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
+            '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
+            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
+            '/' -> {
+                if (match('/')){
+                    while (peek() != '\n' && !isAtEnd()) 
+                    advance()
+                } else if (match('*')){ //for the multiple line comment
+                    while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()){
+                        advance() //consumes /
+                    }
+                    if (isAtEnd()){ //not finished /* */
+                        reportError(line, "Unterminated block comment.")
+                    } else {
+                        advance() //consumes *
+                        advance() //consumes /
+                    }
+                }else {
+                    addToken("SLASH") // for non comments
+                }
             }
-            if (type != "NULL"){ //redudant daw sabi ni sir
-                val newToken = Token(type, char.toString(), line)
-                tokens.add(newToken)
-            }
+            ' ', '\r', '\t' -> {}         //ignore whitespace
+            '\n' -> {}
+            '"' -> string()
+            else -> {
+                if (isAlpha(c)) identifier()
+                else if (isDigit(c)) number()
+                else reportError(line, "Unexpected character '$c'.")
+        }
         }
     }
-
-    fun printTokens(){
-        // token output
-        for (token in tokens){
+    
+    fun printTokens() {
+        for (token in tokens) {
             System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
         }
     }
 }
-
-
-
-
-

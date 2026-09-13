@@ -1,8 +1,9 @@
 package atelier
 //token template
-data class Token(val type: String, val lexeme: String, val line: Int){
+data class Token(val type: String, val lexeme: String, val literal: Any? = null, val line: Int){
     override fun toString(): String {
         //custom tokenize output format
-        return "Token(type=$type, lexeme=$lexeme, line=$line)\n"
+        //added literal
+        return "Token(type=$type, lexeme=$lexeme, literal=$literal, line=$line)\n"
     }
-}
+} 
