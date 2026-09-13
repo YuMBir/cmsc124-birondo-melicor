@@ -9,11 +9,19 @@ private fun fail(message: String): Nothing {
 }
 
 //scanner class so that we don't have to keep passing values
-class Scanner(val source: String) {
+class Scanner(private var source: String = "") {
     var tokens = mutableListOf<Token>()
     private var start = 0 //index indicates present lexeme
     private var current = 0 //index indicating how far the file is read
     private var line = 1
+
+    init {
+        //write init code here
+    }
+
+    fun scanLine(sourceLine: String){
+        this.source = sourceLine
+    }
 
     var hadError = false
         private set
@@ -93,10 +101,6 @@ class Scanner(val source: String) {
         }
         tokens.add(Token("EOF", "", line = line))
     }
-    init { //pwede man ilagay dito ang code inside sang tokenize
-        tokenize()
-    }
-
     private fun scanToken(){ //hindi ko gin enum class
         when (val c = advance()){
            '(' -> addToken("LEFT_PAREN")

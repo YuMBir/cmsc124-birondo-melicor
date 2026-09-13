@@ -35,6 +35,7 @@ fun main(args: Array<String>) {
 //main controller
 fun run(source: String, mode: String = "--print") {
     val atelierScanner = Scanner(source)
+    atelierScanner.tokenize()
     if (atelierScanner.hadError) exitProcess(65) //added this
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
@@ -56,12 +57,14 @@ fun scanCode(path: String): String{
 fun repl(){
     val limit = 200
     var lineNo = 1
+    val atelierScanner = Scanner()
     do  {
         val line: String? = readLine()
         //exits repl if empty string
         if (!line.isNullOrEmpty()) {
-            val atelierScanner = Scanner(line)
+            atelierScanner.scanLine(line)
             //need to update token function so it knows what line it's in
+            atelierScanner.tokenize()
             atelierScanner.printTokens()
         }
         else{
