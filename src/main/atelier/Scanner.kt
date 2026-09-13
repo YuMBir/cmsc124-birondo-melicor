@@ -24,8 +24,6 @@ class Scanner(private var source: String = "") {
     }
 
     var hadError = false
-        private set
-
     private val keywords = mapOf(
         "var" to "VAR",
         "print" to "PRINT"
@@ -51,19 +49,16 @@ class Scanner(private var source: String = "") {
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal,line))
     }
-    private fun isDigit(c: Char) = c in '0'..'9' //checks if the character is a number/digit
-    private fun isAlpha(c: Char) = c in 'a'..'z' || c in 'A'..'Z' || c == '_' //checks if the character is alphabet
-    private fun isAlphaNumeric(c: Char) = isAlpha(c) || isDigit(c) //checks if character or number, for cases such as var1
     private fun identifier() {
-        while (isAlphaNumeric(peek())) advance() //looks through whole identifier
+        while (peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
         addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
     }
     private fun number() { //this is for dealing with numbers
-        while (isDigit(peek())) advance()// handles decimal point
-        if (peek() == '.' && isDigit(peekNext())) { //if decimal poimt
+        while (peek().isDigit()) advance()// handles decimal point
+        if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
-            while (isDigit(peek())) advance()
+            while (peek().isDigit()) advance()
         }
         val value = source.substring(start, current)
         addToken("NUMBER", value.toDouble())
@@ -135,8 +130,8 @@ class Scanner(private var source: String = "") {
             '\n' -> {}
             '"' -> string()
             else -> {
-                if (isAlpha(c)) identifier()
-                else if (isDigit(c)) number()
+                if (c.isLetter()) identifier()
+                else if (c.isDigit()) number()
                 else reportError(line, "Unexpected character '$c'.")
         }
         }
