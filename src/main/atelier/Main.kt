@@ -62,8 +62,9 @@ fun repl(){
         val line: String? = readLine()
         //exits repl if empty string
         if (!line.isNullOrEmpty()) {
+            atelierScanner.resetTokenizer()
             atelierScanner.scanLine(line)
-            //need to update token function so it knows what line it's in
+            atelierScanner.setLine(lineNo)
             atelierScanner.tokenize()
             atelierScanner.printTokens()
         }

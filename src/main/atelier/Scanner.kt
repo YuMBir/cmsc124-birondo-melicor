@@ -136,6 +136,15 @@ class Scanner(private var source: String = "") {
         }
         }
     }
+    //for REPL
+    fun resetTokenizer(){
+        current = 0
+        tokens.clear()
+    }
+    //set line
+    fun setLine(lineNo: Int){
+        line = lineNo
+    }
 
     fun printTokens() {
         for (token in tokens) {
