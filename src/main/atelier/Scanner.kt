@@ -1,7 +1,5 @@
 package atelier
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.system.exitProcess
 
 //use this for scanner errors, it's good practice to have separate fail functions so we know where the error comes from
@@ -11,28 +9,28 @@ private fun fail(message: String): Nothing {
 }
 
 //scanner class so that we don't have to keep passing values
-class Scanner(path: String) {
+class Scanner(private var source: String = "") {
     var tokens = mutableListOf<Token>()
-    val source: String = try { //source contains the string
-        Files.readString(Path.of(path), StandardCharsets.UTF_8) //read entire contents of a text file as a single string
-    } catch (error: Exception) {
-        fail("cannot read '$path': ${error.message}")
-    }
-    
-    private var start = 0 //index indicates present lexeme 
+    private var start = 0 //index indicates present lexeme
     private var current = 0 //index indicating how far the file is read
     private var line = 1
 
-    var hadError = false
-        private set 
+    init {
+        //write init code here
+    }
 
-    private val keywords = mapOf( 
+    fun scanLine(sourceLine: String){
+        this.source = sourceLine
+    }
+
+    var hadError = false
+    private val keywords = mapOf(
         "var" to "VAR",
         "print" to "PRINT"
     )
 
-    
-    private fun isAtEnd() = current >= source.length //checks for file ending 
+
+    private fun isAtEnd() = current >= source.length //checks for file ending
     private fun advance(): Char { //consumes the character
         val c = source[current++]
         if (c == '\n') {
@@ -42,7 +40,7 @@ class Scanner(path: String) {
     }
     //reads a character that isn't consumed yet, in other words, it implements lookahead
     private fun peek(): Char = if (isAtEnd()) '\u0000' else source[current]
-    private fun match(expected: Char): Boolean { 
+    private fun match(expected: Char): Boolean {
         if (isAtEnd() || source[current] != expected ) return false  //no character left or next character is not the expected character
         current++
         return true //consumes a match
@@ -51,19 +49,16 @@ class Scanner(path: String) {
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal,line))
     }
-    private fun isDigit(c: Char) = c in '0'..'9' //checks if the character is a number/digit
-    private fun isAlpha(c: Char) = c in 'a'..'z' || c in 'A'..'Z' || c == '_' //checks if the character is alphabet
-    private fun isAlphaNumeric(c: Char) = isAlpha(c) || isDigit(c) //checks if character or number, for cases such as var1
     private fun identifier() {
-        while (isAlphaNumeric(peek())) advance() //looks through whole identifier
+        while (peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
         addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
     }
     private fun number() { //this is for dealing with numbers
-        while (isDigit(peek())) advance()// handles decimal point
-        if (peek() == '.' && isDigit(peekNext())) { //if decimal poimt 
+        while (peek().isDigit()) advance()// handles decimal point
+        if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
-            while (isDigit(peek())) advance()
+            while (peek().isDigit()) advance()
         }
         val value = source.substring(start, current)
         addToken("NUMBER", value.toDouble())
@@ -82,9 +77,9 @@ class Scanner(path: String) {
         val value = source.substring(start + 1, current - 1)   // strip surrounding quotes
         addToken("STRING", value)
         }
-        private fun reportError(line: Int, message: String) {
+    private fun reportError(line: Int, message: String) {
         hadError = true
-        System.err.println("[line $line] Error: $message")
+        fail("[line $line] Error: $message")
     }
 
 
@@ -101,10 +96,6 @@ class Scanner(path: String) {
         }
         tokens.add(Token("EOF", "", line = line))
     }
-    init { //pwede man ilagay dito ang code inside sang tokenize
-        tokenize() 
-    }
-  
     private fun scanToken(){ //hindi ko gin enum class
         when (val c = advance()){
            '(' -> addToken("LEFT_PAREN")
@@ -119,7 +110,7 @@ class Scanner(path: String) {
             '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
             '/' -> {
                 if (match('/')){
-                    while (peek() != '\n' && !isAtEnd()) 
+                    while (peek() != '\n' && !isAtEnd())
                     advance()
                 } else if (match('*')){ //for the multiple line comment
                     while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()){
@@ -139,13 +130,22 @@ class Scanner(path: String) {
             '\n' -> {}
             '"' -> string()
             else -> {
-                if (isAlpha(c)) identifier()
-                else if (isDigit(c)) number()
+                if (c.isLetter()) identifier()
+                else if (c.isDigit()) number()
                 else reportError(line, "Unexpected character '$c'.")
         }
         }
     }
-    
+    //for REPL
+    fun resetTokenizer(){
+        current = 0
+        tokens.clear()
+    }
+    //set line
+    fun setLine(lineNo: Int){
+        line = lineNo
+    }
+
     fun printTokens() {
         for (token in tokens) {
             System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
