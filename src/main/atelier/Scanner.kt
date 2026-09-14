@@ -77,9 +77,9 @@ class Scanner(private var source: String = "") {
         val value = source.substring(start + 1, current - 1)   // strip surrounding quotes
         addToken("STRING", value)
         }
-        private fun reportError(line: Int, message: String) {
+    private fun reportError(line: Int, message: String) {
         hadError = true
-        System.err.println("[line $line] Error: $message")
+        fail("[line $line] Error: $message")
     }
 
 
