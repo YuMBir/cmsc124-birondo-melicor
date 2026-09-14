@@ -55,16 +55,15 @@ fun scanCode(path: String): String{
 
 //REPL
 fun repl(){
-    val limit = 200
+    val limit = 100
     var lineNo = 1
     val atelierScanner = Scanner()
     do  {
-        val line: String? = readLine()
+        val line: String? = readlnOrNull()
         //exits repl if empty string
         if (!line.isNullOrEmpty()) {
             atelierScanner.resetTokenizer()
             atelierScanner.scanLine(line)
-            atelierScanner.setLine(lineNo)
             atelierScanner.tokenize()
             atelierScanner.printTokens()
         }
@@ -73,7 +72,8 @@ fun repl(){
             exitProcess(0)
         }
         lineNo++
-    } while (lineNo < limit)
-
+    } while (lineNo <= limit)
+    System.out.write("Line Limit Reached. Exiting REPL".toByteArray(StandardCharsets.UTF_8))
+    exitProcess(0)
 }
 
