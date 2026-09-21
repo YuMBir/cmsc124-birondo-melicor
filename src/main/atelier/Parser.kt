@@ -24,6 +24,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun setParser(newTokens: List<Token>){
         current = 0
+        expressions.clear()
         tokens = newTokens
 
     }
