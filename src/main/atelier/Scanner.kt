@@ -24,7 +24,7 @@ class Scanner(private var source: String = "") {
     }
 
     var hadError = false
-    private val keywords = mapOf(
+    private val keywords = mapOf( //added keywords for loops, and boolean
         "var" to "VAR",
         "print" to "PRINT", 
         "for" to "FOR",
@@ -32,7 +32,9 @@ class Scanner(private var source: String = "") {
         "if" to "IF",
         "else" to "ELSE",
         "true" to "TRUE",
-        "false" to "FALSE"
+        "false" to "FALSE",
+        "and" to "AND",
+        "or" to "OR"
     )
 
 
@@ -70,8 +72,7 @@ class Scanner(private var source: String = "") {
         }
         addToken(type, literal)
     }
-    private fun number() { //this is for dealing with numbers
-        val isFloat = false
+    private fun number() { //this is for dealing with numbers, updated to deal with number format errors
         while (peek().isDigit()) advance()// handles decimal point
 
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
@@ -86,7 +87,6 @@ class Scanner(private var source: String = "") {
         } else{
             addToken("NUMBER", d)
         }
-       // addToken("NUMBER", value.toDouble())
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
 
