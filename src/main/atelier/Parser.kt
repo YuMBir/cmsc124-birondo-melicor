@@ -12,12 +12,14 @@ class Parser(private var tokens: List<Token> = listOf()) {
     var expressions = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
+        System.out.write("AST: \n".toByteArray(StandardCharsets.UTF_8))
         for (expression in expressions){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
         }
         if (expressions.isEmpty()){
             System.out.write("Nothing parsed\n".toByteArray(StandardCharsets.UTF_8))
         }
+        System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
     }
 
     fun setParser(newTokens: List<Token>){
@@ -37,7 +39,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun match(vararg type: String): Boolean{
-        if (peek().type in type){
+        if (peek().getType() in type){
             consume(*type)
             return true
         }
@@ -47,7 +49,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun consume(vararg type: String): Token{
-        if (peek().type in type){
+        if (peek().getType() in type){
             return tokens[current++]
         }
         else{
@@ -59,7 +61,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return tokens[current - 1]
     }
 
-    fun isAtEnd() = peek().type == "EOF"
+    fun isAtEnd() = peek().getType() == "EOF"
 
     fun expression(): Expr{
         return term()

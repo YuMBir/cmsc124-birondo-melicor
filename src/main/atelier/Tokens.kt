@@ -1,6 +1,6 @@
 package atelier
 //token template
-data class Token(val type: String, val lexeme: String, val literal: Any? = null, val line: Int){
+data class Token(private val type: String, private val lexeme: String, private val literal: Any? = null, val line: Int){
     override fun toString(): String {
         //custom tokenize output format
         //added literal
@@ -8,5 +8,11 @@ data class Token(val type: String, val lexeme: String, val literal: Any? = null,
     }
     fun getLiteralValue(): Any?{
         return literal
+    }
+    fun getLexeme(): String{
+        return lexeme
+    }
+    fun getType(): String{
+        return type
     }
 } 

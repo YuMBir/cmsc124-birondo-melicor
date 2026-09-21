@@ -15,7 +15,7 @@ class Literal(val literal: Any) : Expr{
 }
 class Binary(val left: Expr, val operator:Token, val right: Expr) : Expr{
     override fun toString(): String {
-        return "$left ${operator.getLiteralValue()} $right"
+        return "( ${operator.getLexeme()} $left $right)"
     }
 }
 
