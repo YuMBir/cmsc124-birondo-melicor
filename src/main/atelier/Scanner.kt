@@ -37,7 +37,8 @@ class Scanner(private var source: String = "") {
         "or" to "OR",
         "circle" to "CIRCLE",
         "sigil" to "SIGIL",
-        "imbue" to "IMBUE"
+        "imbue" to "IMBUE",
+        "null" to "NIL"
     )
 
 
