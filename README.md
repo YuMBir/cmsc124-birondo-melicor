@@ -48,9 +48,15 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Operators
 
 
-| Operator | Category | Operands | Associativity | Precedence |
-|---|---|---|---|---|
-| [op] | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
+| Operator                         | Category                                             | Operands          | Associativity       | Precedence |
+|----------------------------------|------------------------------------------------------|-------------------|---------------------|---|
+| `(`, `)`                         | grouping                                             | binary            | left                | [1 = loosest] |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | [1 = loosest] |
+| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | [1 = loosest] |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | [1 = loosest] |
+| `!`                               | logical                                              | binary   | left                | [1 = loosest] |
+| `and`, `or`                      | logical                                              | binary   | left                | [1 = loosest] |
+| [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
 ### Literals
