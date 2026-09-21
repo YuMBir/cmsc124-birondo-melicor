@@ -142,7 +142,7 @@ class Scanner(private var source: String = "") {
         tokens.clear()
     }
 
-    fun getTokens(): List<Token>{
+    fun getTokenList(): List<Token>{
         return tokens
     }
 

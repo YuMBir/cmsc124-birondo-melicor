@@ -1,5 +1,5 @@
 {
-  "ext": ".mylang",
+  "ext": ".spell",
   "flag": "--parse",
   "mode": "sidecar"
 }
