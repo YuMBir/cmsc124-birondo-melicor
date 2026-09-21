@@ -54,7 +54,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 | Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
 |----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
 | `(`, `)`                         | grouping                                             | binary            | left                | 10            |
-| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 4             |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 5             |
 | `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 4             |
 | `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
 | `!`                              | logical                                              | binary   | left                | 2             |
