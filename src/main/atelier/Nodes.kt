@@ -3,9 +3,9 @@ package atelier
 sealed interface Expr{
     override fun toString(): String
 }
-class Group(expr: Expr) : Expr{
+class Group(val node: Token) : Expr{
     override fun toString(): String {
-        return super.toString()
+        return "(${node.getLiteral()})"
     }
 }
 class Literal(val literal: Any) : Expr{
