@@ -35,13 +35,13 @@ fun main(args: Array<String>) {
 //main controller
 fun run(source: String, mode: String = "--print") {
     val atelierScanner = Scanner(source)
-    atelierScanner.tokenize()
-    if (atelierScanner.hadError) exitProcess(65) //added this
+    atelierScanner.tokenize() 
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
         "--tokenize" -> atelierScanner.printTokens()
         else -> fail("invalid flag")
     }
+    if (atelierScanner.hadError) exitProcess(65) //placed this after when expression, to print the token statements instead of just returning error statements
 
 }
 fun scanCode(path: String): String{
