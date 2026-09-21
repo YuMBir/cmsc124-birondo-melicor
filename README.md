@@ -40,51 +40,61 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Keywords
 
 
-| Keyword | Purpose |
-|---|---|
-| [word] | [what it does] |
+| Keyword  | Purpose                                                              |
+|----------|----------------------------------------------------------------------|
+| `circle` | blueprint for producing a spell, much like a class creates an object |
+| `sigil`  | stores information used in spells, like a variable                   |
+| `imbue`  | [not sure yet]                                                       |
+
 
 
 ### Operators
 
 
-| Operator | Category | Operands | Associativity | Precedence |
-|---|---|---|---|---|
-| [op] | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
+| Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
+|----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
+| `(`, `)`                         | grouping                                             | binary            | left                | 10            |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 4             |
+| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 4             |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
+| `!`                              | logical                                              | binary   | left                | 2             |
+| `and`, `or`                      | logical                                              | binary   | left                | 2             |
+| `=`                               | assignment                                           | binary   | left                | 1             |
+| [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
 ### Literals
 
 
-| Kind | Syntax | Produces |
-|---|---|---|
-| [number] | [e.g. 42, 3.14] | [what runtime value] |
-| [string] | [e.g. "hello", escapes supported] | [what runtime value] |
-| [boolean] | [true, false] | [what runtime value] |
-| [nil] | [spelling] | [what runtime value] |
+| Kind | Syntax                        | Produces                          |
+|---|-------------------------------|-----------------------------------|
+| [number] | e.g. `42`, `3.14`             | `42.0` `3.14` *stored as doubles* |
+| [string] | `"hello"` *escapes supported* | "hello"                           |
+| [boolean] | `true`, `false`                | boolean `true` and boolean `false` |
+| [nil] | `null`                        | `null`                            |
 
 
 ### Identifiers
 
-- Start characters: [which]
-- Continue characters: [which]
-- Case-sensitive: [yes or no]
+- Start characters: `a-z`, `A-Z`
+- Continue characters: `a-z`, `A-Z`, `0-9`, `_`
+- Case-sensitive: YES
 - [Reserved patterns, length limits, or other restrictions.]
 
 ### Comments
 
-- Line comments: [token]
-- Block comments: [tokens, or "not supported"]
-- Nesting: [supported or not]
+- Line comments: `// Inline Comments`
+- Block comments: `/* Block Comments */`
+- Nesting: NOT SUPPORTED
 - [Harness note: comment_prefix in tests/lab*/manifest.json is set to the
   token above.]
 
 ## Whitespace and termination
 
-- Whitespace significant: [yes or no, and where]
-- Statement terminator: [e.g. semicolon, newline, none]
-- Block delimiters: [e.g. braces, indentation]
-- Grouping delimiters: [e.g. parentheses]
+- Whitespace significant: Not significant (so far)
+- Statement terminator: Newline `\n`
+- Block delimiters: `{}`
+- Grouping delimiters: `()`
 
 ## Token output format
 
@@ -98,8 +108,28 @@ changelog.]
 ## Grammar
 
 ```
-[Your complete context-free grammar, current as of the latest activity.
-Unambiguous, with precedence and associativity encoded in rule structure.]
+letter := "A" | "B" | "C" | "D" | "E" | "F" | "G"
+       | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+       | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+       | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
+       | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p"
+       | "q" | "r" | "s" | "t" | "u" | "v" | "w"
+       | "x" | "y" | "z" ;
+
+digit := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
+       | "'" | '"' | "=" | "|" | "." | "," | ";" | "-" 
+       | "+" | "*" | "?" | "\n" | "\t" | "\r" | "\f" | "\b" ;
+
+character := letter | digit | symbol | "_" | " " ;
+identifier := letter , { letter | digit | "_" } ;
+
+expression := term
+term       ::= factor { ( PLUS | MINUS ) factor }
+factor     ::= primary { ( STAR | SLASH ) primary }
+primary    ::= NUMBER | LEFT_PAREN expression RIGHT_PAREN 
 ```
 
 ## Parse output format
@@ -120,9 +150,9 @@ language.]
 
 ### Value printing
 
-- Numbers: [e.g. 5 rather than 5.0]
-- Nil: [spelling]
-- Strings: [with or without quotes]
+- Numbers: `1.0` &mdash; Numbers are handled as doubles and printed as doubles
+- Nil: `null`
+- Strings: `"this is a string"`
 
 ### Truthiness
 
@@ -131,12 +161,12 @@ true.]
 
 ### Operator semantics
 
-- Arithmetic: [accepted operand types]
+- Arithmetic: `+ - * /`
 - `+` on strings: [concatenation, error, or coercion]
-- Mixed types: [what happens]
-- Comparison: [accepted operand types]
+- Mixed types: Number types are automatically type-casted to the bigger type
+- Comparison: Integer and Character
 - Equality across types: [false, or an error]
-- Division by zero: [value produced, or runtime error]
+- Division by zero: Produces a runtime error
 
 ### Scope and bindings
 
