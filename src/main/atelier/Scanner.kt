@@ -34,7 +34,10 @@ class Scanner(private var source: String = "") {
         "true" to "TRUE",
         "false" to "FALSE",
         "and" to "AND",
-        "or" to "OR"
+        "or" to "OR",
+        "circle" to "CIRCLE",
+        "sigil" to "SIGIL",
+        "imbue" to "IMBUE"
     )
 
 

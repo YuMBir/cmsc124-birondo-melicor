@@ -7,4 +7,7 @@ Token(type=IDENTIFIER, lexeme=greeting, literal=null, line=2)
 Token(type=STRING, lexeme="abc
 def", literal=abc
 def, line=3)
-Token(type=EOF, lexeme=, literal=null, line=4)
+Token(type=CIRCLE, lexeme=circle, literal=null, line=5)
+Token(type=SIGIL, lexeme=sigil, literal=null, line=5)
+Token(type=IMBUE, lexeme=imbue, literal=null, line=5)
+Token(type=EOF, lexeme=, literal=null, line=5)
