@@ -73,9 +73,9 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 
 ### Comments
 
-- Line comments: [token]
-- Block comments: [tokens, or "not supported"]
-- Nesting: [supported or not]
+- Line comments: `// Inline Comments`
+- Block comments: `/* Block Comments */`
+- Nesting: **Not Supported**
 - [Harness note: comment_prefix in tests/lab*/manifest.json is set to the
   token above.]
 
