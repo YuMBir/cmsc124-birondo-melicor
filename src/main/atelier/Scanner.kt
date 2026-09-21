@@ -153,6 +153,7 @@ class Scanner(private var source: String = "") {
             '{' -> addToken("LEFT_BRACE")
             '}' -> addToken("RIGHT_BRACE")
             ':' -> addToken("COLON")
+            ';' -> addToken("SEMICOLON")
             '.' -> addToken("DOT")
             '*' -> addToken("STAR")
             '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
