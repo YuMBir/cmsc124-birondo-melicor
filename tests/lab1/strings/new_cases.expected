@@ -1,4 +1,3 @@
-Token(type=STRING, lexeme="thi\s is a str\ing", literal=this is a string, line=1)
 Token(type=STRING, lexeme="a\"b", literal=a"b, line=2)
 Token(type=STRING, lexeme="abc\\", literal=abc\, line=3)
 Token(type=NUMBER, lexeme=3.14, literal=3.14, line=4)

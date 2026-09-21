@@ -89,39 +89,50 @@ class Scanner(private var source: String = "") {
         }
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
+    private fun isAllowedInString(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' 
 
     private fun string(){
         val startLine = line
         val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
+        var valid = true
 
         while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
             if ( peek() == '\\'){ //if the char is the start of an escape sequence
                 advance() //consume backlash, not adding to sb
                 if (isAtEnd()) { //backlash is the last char in the file
-                    reportError(startLine, "Unterminated string.") //no char after it
-                    addToken("STRING", sb.toString(), startLine) //add a token with what has been read, also passed startLine
-                    return //exit early, nothing left to scan, token is already recorded by code above
+                    break
                 }
                 when (val e = advance()){ //checks the char after backslash
-                    'n' -> sb.append('\n')// \n -> real newlife char
-                    't' -> sb.append('\t') // \t -> real tab char
-                    '"' -> sb.append('"') // \" -> quote, does not close the string
-                    '\\' -> sb.append('\\') // \\ -> single backslash
+                    'n' -> sb.append('\n')
+                    't' -> sb.append('\t')
+                    '"' -> sb.append('"')   
+                    '\\' -> sb.append('\\')
                     else -> { 
                         reportError(line, "Unkown escape '\\$e'.") //report unknown escape
-                        sb.append(e)} //the unknown char will recorded, to not lose the data
+                        valid=false
+                    } //the unknown char will recorded, to not lose the data
                 }
             } else{ //for ordinary char
-                sb.append(advance())
+                val c = advance()
+                when {
+                    c == '\n' -> sb.append(c) // raw newlines allowed
+                    c == '\r' && peek() == '\n' -> { /* skip, the '\n' is appended next */ }
+                    !isAllowedInString(c) -> {
+                        reportError(line, "Invalid character '$c' in string; only A-Z, a-z, and '_' allowed.")
+                        valid = false
+                    }
+                    else -> sb.append(c)
+            }
             }
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
-            addToken("STRING", sb.toString(), startLine)
-            return
+        } else {
+            advance()
         }
-        advance() //consume the closing quote
-        addToken("STRING",  sb.toString(), startLine)//show the full read value
+        if (valid) {
+            addToken("STRING",  sb.toString(), startLine)
+        }
     }
 
 
