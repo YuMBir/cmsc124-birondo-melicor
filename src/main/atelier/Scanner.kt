@@ -30,7 +30,9 @@ class Scanner(private var source: String = "") {
         "for" to "FOR",
         "while" to "WHILE",
         "if" to "IF",
-        "else" to "ELSE"
+        "else" to "ELSE",
+        "true" to "TRUE",
+        "false" to "FALSE"
     )
 
 
@@ -45,6 +47,7 @@ class Scanner(private var source: String = "") {
         }
         return c
     }
+
     //reads a character that isn't consumed yet, in other words, it implements lookahead
     private fun peek(): Char = if (isAtEnd()) '\u0000' else source[current]
     private fun match(expected: Char): Boolean {
@@ -59,7 +62,13 @@ class Scanner(private var source: String = "") {
     private fun identifier() {
         while (peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
-        addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
+        val type = keywords[text] ?: "IDENTIFIER" //keyword or identifier
+        val literal: Any? = when (type) { //for the handling of boolean, true or false
+            "TRUE" -> true
+            "FALSE" -> false
+            else -> null
+        }
+        addToken(type, literal)
     }
     private fun number() { //this is for dealing with numbers
         val isFloat = false
@@ -102,7 +111,7 @@ class Scanner(private var source: String = "") {
                         reportError(line, "Unkown escape '\\$e'.") //report unknown escape
                         sb.append(e)} //the unknown char will recorded, to not lose the data
                 }
-            } else{ //for orfinary char
+            } else{ //for ordinary char
                 sb.append(advance())
             }
         }
