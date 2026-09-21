@@ -40,9 +40,12 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Keywords
 
 
-| Keyword | Purpose |
-|---|---|
-| [word] | [what it does] |
+| Keyword  | Purpose                                                              |
+|----------|----------------------------------------------------------------------|
+| `circle` | blueprint for producing a spell, much like a class creates an object |
+| `sigil`  | stores information used in spells, like a variable                   |
+| `imbue`  | [not sure yet]                                                       |
+
 
 
 ### Operators
