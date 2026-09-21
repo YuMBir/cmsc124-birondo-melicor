@@ -142,9 +142,14 @@ class Scanner(private var source: String = "") {
         tokens.clear()
     }
 
+    fun getTokens(): List<Token>{
+        return tokens
+    }
+
     fun printTokens() {
         for (token in tokens) {
             System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
         }
     }
+
 }
