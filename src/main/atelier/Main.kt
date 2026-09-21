@@ -73,6 +73,8 @@ fun repl(){
             atelierScanner.tokenize()
             val tokens = atelierScanner.getTokenList()
             atelierScanner.printTokens()
+
+            System.out.write("AST: \n".toByteArray(StandardCharsets.UTF_8))
             atelierParser.setParser(tokens)
             atelierParser.parse()
             atelierParser.printAST()

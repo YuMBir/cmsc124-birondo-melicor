@@ -12,9 +12,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
     var expressions = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
-        System.out.write("AST: \n".toByteArray(StandardCharsets.UTF_8))
         for (expression in expressions){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
+            System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
         }
         if (expressions.isEmpty()){
             System.out.write("Nothing parsed\n".toByteArray(StandardCharsets.UTF_8))

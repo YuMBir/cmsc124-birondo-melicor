@@ -5,7 +5,7 @@ sealed interface Expr{
 }
 class Group(val node: Expr) : Expr{
     override fun toString(): String {
-        return "($node)"
+        return "(group $node)"
     }
 }
 class Literal(val literal: Any) : Expr{
@@ -15,7 +15,7 @@ class Literal(val literal: Any) : Expr{
 }
 class Binary(val left: Expr, val operator:Token, val right: Expr) : Expr{
     override fun toString(): String {
-        return "( ${operator.getLexeme()} $left $right)"
+        return "(${operator.getLexeme()} $left $right)"
     }
 }
 
