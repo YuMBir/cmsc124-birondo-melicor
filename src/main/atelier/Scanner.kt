@@ -57,9 +57,9 @@ class Scanner(private var source: String = "") {
         current++
         return true //consumes a match
     }
-    private fun addToken(type: String, literal: Any? = null) {
+    private fun addToken(type: String, literal: Any? = null, tokenLine: Int = line) { //added tokenLine: Int = line to avoid the buggy line number saved 
         val text = source.substring(start,current)
-        tokens.add(Token(type,text,literal,line))
+        tokens.add(Token(type,text,literal,tokenLine))
     }
     private fun identifier() {
         while (peek().isLetterOrDigit()) advance() //looks through whole identifier
@@ -99,7 +99,7 @@ class Scanner(private var source: String = "") {
                 advance() //consume backlash, not adding to sb
                 if (isAtEnd()) { //backlash is the last char in the file
                     reportError(startLine, "Unterminated string.") //no char after it
-                    addToken("STRING", sb.toString()) //add a token with what has been read
+                    addToken("STRING", sb.toString(), startLine) //add a token with what has been read, also passed startLine
                     return //exit early, nothing left to scan, token is already recorded by code above
                 }
                 when (val e = advance()){ //checks the char after backslash
@@ -117,11 +117,11 @@ class Scanner(private var source: String = "") {
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
-            addToken("STRING", source.substring(start+1, current))
+            addToken("STRING", sb.toString(), startLine)
             return
         }
         advance() //consume the closing quote
-        addToken("STRING", sb.toString()) //show the full read value
+        addToken("STRING",  sb.toString(), startLine)//show the full read value
     }
 
 
