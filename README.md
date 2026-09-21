@@ -81,10 +81,10 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 
 ## Whitespace and termination
 
-- Whitespace significant: [yes or no, and where]
-- Statement terminator: [e.g. semicolon, newline, none]
-- Block delimiters: [e.g. braces, indentation]
-- Grouping delimiters: [e.g. parentheses]
+- Whitespace significant: Not significant (so far)
+- Statement terminator: Newline `\n`
+- Block delimiters: `{}`
+- Grouping delimiters: `()`
 
 ## Token output format
 
@@ -131,12 +131,12 @@ true.]
 
 ### Operator semantics
 
-- Arithmetic: [accepted operand types]
+- Arithmetic: `+ - * /`
 - `+` on strings: [concatenation, error, or coercion]
-- Mixed types: [what happens]
-- Comparison: [accepted operand types]
+- Mixed types: Number types are automatically type-casted to the bigger type
+- Comparison: Integer and Character
 - Equality across types: [false, or an error]
-- Division by zero: [value produced, or runtime error]
+- Division by zero: Produces a runtime error
 
 ### Scope and bindings
 
