@@ -1,5 +1,6 @@
 package atelier
 
+import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
 private fun fail(message: String): Nothing {
@@ -7,17 +8,27 @@ private fun fail(message: String): Nothing {
     exitProcess(65)
 }
 
-class Parser(private var tokens: List<Token>) {
+class Parser(private var tokens: List<Token> = listOf()) {
     var expressions = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
         for (expression in expressions){
-            println(expression)
+            System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
+        }
+        if (expressions.isEmpty()){
+            System.out.write("Nothing parsed\n".toByteArray(StandardCharsets.UTF_8))
         }
     }
+
+    fun setParser(newTokens: List<Token>){
+        current = 0
+        tokens = newTokens
+
+    }
+
     fun parse(){
         while (!isAtEnd()) {
-            expression()
+            expressions.add(expression())
         }
     }
 
@@ -31,7 +42,6 @@ class Parser(private var tokens: List<Token>) {
             return true
         }
         else{
-            consume(*type)
             return false
         }
     }
@@ -41,7 +51,7 @@ class Parser(private var tokens: List<Token>) {
             return tokens[current++]
         }
         else{
-            fail("unexpected token")
+            fail("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -49,7 +59,7 @@ class Parser(private var tokens: List<Token>) {
         return tokens[current - 1]
     }
 
-    fun isAtEnd() = current >= tokens.size
+    fun isAtEnd() = peek().type == "EOF"
 
     fun expression(): Expr{
         return term()

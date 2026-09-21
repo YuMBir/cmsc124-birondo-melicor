@@ -38,6 +38,7 @@ fun run(source: String, mode: String = "--print") {
     atelierScanner.tokenize()
     val tokens = atelierScanner.getTokenList()
     val atelierParser = Parser(tokens)
+    atelierParser.parse()
     if (atelierScanner.hadError) exitProcess(65) //added this
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
@@ -62,6 +63,7 @@ fun repl(){
     val limit = 100
     var lineNo = 1
     val atelierScanner = Scanner()
+    val atelierParser = Parser()
     do  {
         val line: String? = readlnOrNull()
         //exits repl if empty string
@@ -69,7 +71,11 @@ fun repl(){
             atelierScanner.resetTokenizer()
             atelierScanner.scanLine(line)
             atelierScanner.tokenize()
+            val tokens = atelierScanner.getTokenList()
             atelierScanner.printTokens()
+            atelierParser.setParser(tokens)
+            atelierParser.parse()
+            atelierParser.printAST()
         }
         else{
             System.out.write("Exited REPL".toByteArray(StandardCharsets.UTF_8))
