@@ -56,26 +56,26 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Literals
 
 
-| Kind | Syntax | Produces |
-|---|---|---|
-| [number] | [e.g. 42, 3.14] | [what runtime value] |
-| [string] | [e.g. "hello", escapes supported] | [what runtime value] |
-| [boolean] | [true, false] | [what runtime value] |
-| [nil] | [spelling] | [what runtime value] |
+| Kind | Syntax                      | Produces                          |
+|---|-----------------------------|-----------------------------------|
+| [number] | e.g. `42`, `3.14`           | `42.0` `3.14` *stored as doubles* |
+| [string] | `"hello"` *escapes supported* | "hello"                           |
+| [boolean] | [true, false]               | [what runtime value]              |
+| [nil] | [spelling]                  | [what runtime value]              |
 
 
 ### Identifiers
 
-- Start characters: [which]
-- Continue characters: [which]
-- Case-sensitive: [yes or no]
+- Start characters: `a-z`, `A-Z`
+- Continue characters: `a-z`, `A-Z`, `0-9`, `_`
+- Case-sensitive: YES
 - [Reserved patterns, length limits, or other restrictions.]
 
 ### Comments
 
 - Line comments: `// Inline Comments`
 - Block comments: `/* Block Comments */`
-- Nesting: **Not Supported**
+- Nesting: NOT SUPPORTED
 - [Harness note: comment_prefix in tests/lab*/manifest.json is set to the
   token above.]
 
