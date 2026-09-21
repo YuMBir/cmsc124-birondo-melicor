@@ -6,7 +6,7 @@ data class Token(val type: String, val lexeme: String, val literal: Any? = null,
         //added literal
         return "Token(type=$type, lexeme=$lexeme, literal=$literal, line=$line)\n"
     }
-    fun getLiteral(): String{
-        return literal.toString()
+    fun getLiteral(): Any?{
+        return literal
     }
 } 
