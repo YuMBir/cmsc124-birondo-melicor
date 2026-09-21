@@ -94,11 +94,13 @@ class Scanner(private var source: String = "") {
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
     private fun isAllowedInString(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' 
+    private fun isDigit(c: Char) = c in '0'..'9'
 
     private fun string(){
         val startLine = line
         val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
         var valid = true
+        var seenDigit = false
 
         while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
             if ( peek() == '\\'){ //if the char is the start of an escape sequence
@@ -106,7 +108,12 @@ class Scanner(private var source: String = "") {
                 if (isAtEnd()) { //backlash is the last char in the file
                     break
                 }
-                when (val e = advance()){ //checks the char after backslash
+                val e = advance()
+                if (seenDigit) {
+                    reportError(line, "Escape '\\$e' not allowed after digits; digits may only be trailing.")
+                    valid = false
+                }else{
+                    when (e){ //checks the char after backslash
                     'n' -> sb.append('\n')
                     't' -> sb.append('\t')
                     '"' -> sb.append('"')   
@@ -116,15 +123,25 @@ class Scanner(private var source: String = "") {
                         valid=false
                     } //the unknown char will recorded, to not lose the data
                 }
+                }
+                
             } else{ //for ordinary char
                 val c = advance()
                 when {
                     c == '\n' -> sb.append(c) // raw newlines allowed
                     c == '\r' && peek() == '\n' -> { /* skip, the '\n' is appended next */ }
+                    isDigit(c) -> {           // digits: always OK, but they start the trailing zone
+                        seenDigit = true
+                        sb.append(c)
+                }
                     !isAllowedInString(c) -> {
                         reportError(line, "Invalid character '$c' in string; only A-Z, a-z, and '_' allowed.")
                         valid = false
                     }
+                    seenDigit -> {            // a valid letter/underscore, but it comes after a digit
+                    reportError(line, "Character '$c' after digits; digits may only be trailing.")
+                    valid = false
+                }
                     else -> sb.append(c)
             }
             }
