@@ -26,12 +26,19 @@ class Scanner(private var source: String = "") {
     var hadError = false
     private val keywords = mapOf(
         "var" to "VAR",
-        "print" to "PRINT"
+        "print" to "PRINT", 
+        "for" to "FOR",
+        "while" to "WHILE",
+        "if" to "IF",
+        "else" to "ELSE"
     )
 
 
     private fun isAtEnd() = current >= source.length //checks for file ending
     private fun advance(): Char { //consumes the character
+        check(!isAtEnd()){//added this, as there's no need for advance after EOF
+            "advance() called at EOF, current-$current"
+        }
         val c = source[current++]
         if (c == '\n') {
             line++
@@ -55,33 +62,67 @@ class Scanner(private var source: String = "") {
         addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
     }
     private fun number() { //this is for dealing with numbers
+        val isFloat = false
         while (peek().isDigit()) advance()// handles decimal point
+
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
             while (peek().isDigit()) advance()
         }
         val value = source.substring(start, current)
-        addToken("NUMBER", value.toDouble())
+        val d = value.toDoubleOrNull()//added this, for more checking in the number... to be elaborated
+        if (d == null) {
+            reportError(line,"Invalid number literal '$value'.")
+            addToken("NUMBER", 0.0)
+        } else{
+            addToken("NUMBER", d)
+        }
+       // addToken("NUMBER", value.toDouble())
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
+
     private fun string(){
-        while (peek()!= '"' && !isAtEnd()){
-            advance()
+        val startLine = line
+        val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
+
+        while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
+            if ( peek() == '\\'){ //if the char is the start of an escape sequence
+                advance() //consume backlash, not adding to sb
+                if (isAtEnd()) { //backlash is the last char in the file
+                    reportError(startLine, "Unterminated string.") //no char after it
+                    addToken("STRING", sb.toString()) //add a token with what has been read
+                    return //exit early, nothing left to scan, token is already recorded by code above
+                }
+                when (val e = advance()){ //checks the char after backslash
+                    'n' -> sb.append('\n')// \n -> real newlife char
+                    't' -> sb.append('\t') // \t -> real tab char
+                    '"' -> sb.append('"') // \" -> quote, does not close the string
+                    '\\' -> sb.append('\\') // \\ -> single backslash
+                    else -> { 
+                        reportError(line, "Unkown escape '\\$e'.") //report unknown escape
+                        sb.append(e)} //the unknown char will recorded, to not lose the data
+                }
+            } else{ //for orfinary char
+                sb.append(advance())
+            }
         }
-        if (isAtEnd()) {
-            reportError(line, "Unterminated string.")
+        if(isAtEnd()){ //loop exit because no input left
+            reportError(startLine, "Unterminated string.")
+            addToken("STRING", source.substring(start+1, current))
             return
         }
-        advance()   // consume the closing "
-
-        val value = source.substring(start + 1, current - 1)   // strip surrounding quotes
-        addToken("STRING", value)
-        }
-    private fun reportError(line: Int, message: String) {
-        hadError = true
-        fail("[line $line] Error: $message")
+        advance() //consume the closing quote
+        addToken("STRING", sb.toString()) //show the full read value
     }
 
+
+
+    private fun reportError(line: Int, message: String) {
+        hadError = true
+        //replace the message for fa-il(), to not directly call exitProcess, just print the the error and keep running
+        System.err.println("[line $line] Error: $message")
+    }
+//fail("[line $line] Error: $message")
 
 
     fun printCode(){ //just prints the code in the file line by line
@@ -104,7 +145,10 @@ class Scanner(private var source: String = "") {
             '}' -> addToken("RIGHT_BRACE")
             ':' -> addToken("COLON")
             '.' -> addToken("DOT")
+            '*' -> addToken("STAR")
             '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
+            '+' -> addToken(if (match('+')) "INCREMENT" else "PLUS")
+            '-' -> addToken(if(match('-')) "DECREMENT" else "MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
             '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
