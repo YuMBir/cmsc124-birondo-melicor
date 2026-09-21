@@ -56,12 +56,12 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Literals
 
 
-| Kind | Syntax                      | Produces                          |
-|---|-----------------------------|-----------------------------------|
-| [number] | e.g. `42`, `3.14`           | `42.0` `3.14` *stored as doubles* |
+| Kind | Syntax                        | Produces                          |
+|---|-------------------------------|-----------------------------------|
+| [number] | e.g. `42`, `3.14`             | `42.0` `3.14` *stored as doubles* |
 | [string] | `"hello"` *escapes supported* | "hello"                           |
-| [boolean] | [true, false]               | [what runtime value]              |
-| [nil] | [spelling]                  | [what runtime value]              |
+| [boolean] | `true`, `false`                | boolean `true` and boolean `false` |
+| [nil] | `null`                        | `null`                            |
 
 
 ### Identifiers
@@ -120,9 +120,9 @@ language.]
 
 ### Value printing
 
-- Numbers: [e.g. 5 rather than 5.0]
-- Nil: [spelling]
-- Strings: [with or without quotes]
+- Numbers: `1.0` &mdash; Numbers are handled as doubles and printed as doubles
+- Nil: `null`
+- Strings: `"this is a string"`
 
 ### Truthiness
 
