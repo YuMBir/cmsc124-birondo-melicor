@@ -45,6 +45,7 @@ fun run(source: String, mode: String = "--print") {
         "--parse" -> atelierParser.printAST()
         else -> fail("invalid flag")
     }
+    if (atelierScanner.hadError) exitProcess(65) //placed this after when expression, to print the token statements instead of just returning error statements
 
 }
 fun scanCode(path: String): String{

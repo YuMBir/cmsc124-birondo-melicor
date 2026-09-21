@@ -24,20 +24,36 @@ class Scanner(private var source: String = "") {
     }
 
     var hadError = false
-    private val keywords = mapOf(
+    private val keywords = mapOf( //added keywords for loops, and boolean
         "var" to "VAR",
-        "print" to "PRINT"
+        "print" to "PRINT", 
+        "for" to "FOR",
+        "while" to "WHILE",
+        "if" to "IF",
+        "else" to "ELSE",
+        "true" to "TRUE",
+        "false" to "FALSE",
+        "and" to "AND",
+        "or" to "OR",
+        "circle" to "CIRCLE",
+        "sigil" to "SIGIL",
+        "imbue" to "IMBUE",
+        "null" to "NIL"
     )
 
 
     private fun isAtEnd() = current >= source.length //checks for file ending
     private fun advance(): Char { //consumes the character
+        check(!isAtEnd()){//added this, as there's no need for advance after EOF
+            "advance() called at EOF, current-$current"
+        }
         val c = source[current++]
         if (c == '\n') {
             line++
         }
         return c
     }
+
     //reads a character that isn't consumed yet, in other words, it implements lookahead
     private fun peek(): Char = if (isAtEnd()) '\u0000' else source[current]
     private fun match(expected: Char): Boolean {
@@ -45,43 +61,109 @@ class Scanner(private var source: String = "") {
         current++
         return true //consumes a match
     }
-    private fun addToken(type: String, literal: Any? = null) {
+    private fun addToken(type: String, literal: Any? = null, tokenLine: Int = line) { //added tokenLine: Int = line to avoid the buggy line number saved 
         val text = source.substring(start,current)
-        tokens.add(Token(type,text,literal,line))
+        tokens.add(Token(type,text,literal,tokenLine))
     }
     private fun identifier() {
         while (peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
-        addToken(keywords[text] ?: "IDENTIFIER") //keyword or identifier
+        val type = keywords[text] ?: "IDENTIFIER" //keyword or identifier
+        val literal: Any? = when (type) { //for the handling of boolean, true or false
+            "TRUE" -> true
+            "FALSE" -> false
+            else -> null
+        }
+        addToken(type, literal)
     }
-    private fun number() { //this is for dealing with numbers
+    private fun number() { //this is for dealing with numbers, updated to deal with number format errors
         while (peek().isDigit()) advance()// handles decimal point
+
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
             while (peek().isDigit()) advance()
         }
         val value = source.substring(start, current)
-        addToken("NUMBER", value.toDouble())
+        val d = value.toDoubleOrNull()//added this, for more checking in the number... to be elaborated
+        if (d == null) {
+            reportError(line,"Invalid number literal '$value'.")
+            addToken("NUMBER", 0.0)
+        } else{
+            addToken("NUMBER", d)
+        }
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
+    private fun isAllowedInString(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' 
+    private fun isDigit(c: Char) = c in '0'..'9'
+
     private fun string(){
-        while (peek()!= '"' && !isAtEnd()){
+        val startLine = line
+        val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
+        var valid = true
+        var seenDigit = false
+
+        while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
+            if ( peek() == '\\'){ //if the char is the start of an escape sequence
+                advance() //consume backlash, not adding to sb
+                if (isAtEnd()) { //backlash is the last char in the file
+                    break
+                }
+                val e = advance()
+                if (seenDigit) {
+                    reportError(line, "Escape '\\$e' not allowed after digits; digits may only be trailing.")
+                    valid = false
+                }else{
+                    when (e){ //checks the char after backslash
+                    'n' -> sb.append('\n')
+                    't' -> sb.append('\t')
+                    '"' -> sb.append('"')   
+                    '\\' -> sb.append('\\')
+                    else -> { 
+                        reportError(line, "Unkown escape '\\$e'.") //report unknown escape
+                        valid=false
+                    } //the unknown char will recorded, to not lose the data
+                }
+                }
+                
+            } else{ //for ordinary char
+                val c = advance()
+                when {
+                    c == '\n' -> sb.append(c) // raw newlines allowed
+                    c == '\r' && peek() == '\n' -> { /* skip, the '\n' is appended next */ }
+                    isDigit(c) -> {           // digits: always OK, but they start the trailing zone
+                        seenDigit = true
+                        sb.append(c)
+                }
+                    !isAllowedInString(c) -> {
+                        reportError(line, "Invalid character '$c' in string; only A-Z, a-z, and '_' allowed.")
+                        valid = false
+                    }
+                    seenDigit -> {            // a valid letter/underscore, but it comes after a digit
+                    reportError(line, "Character '$c' after digits; digits may only be trailing.")
+                    valid = false
+                }
+                    else -> sb.append(c)
+            }
+            }
+        }
+        if(isAtEnd()){ //loop exit because no input left
+            reportError(startLine, "Unterminated string.")
+        } else {
             advance()
         }
-        if (isAtEnd()) {
-            reportError(line, "Unterminated string.")
-            return
+        if (valid) {
+            addToken("STRING",  sb.toString(), startLine)
         }
-        advance()   // consume the closing "
-
-        val value = source.substring(start + 1, current - 1)   // strip surrounding quotes
-        addToken("STRING", value)
-        }
-    private fun reportError(line: Int, message: String) {
-        hadError = true
-        fail("[line $line] Error: $message")
     }
 
+
+
+    private fun reportError(line: Int, message: String) {
+        hadError = true
+        //replace the message for fa-il(), to not directly call exitProcess, just print the the error and keep running
+        System.err.println("[line $line] Error: $message")
+    }
+//fail("[line $line] Error: $message")
 
 
     fun printCode(){ //just prints the code in the file line by line
@@ -103,8 +185,12 @@ class Scanner(private var source: String = "") {
             '{' -> addToken("LEFT_BRACE")
             '}' -> addToken("RIGHT_BRACE")
             ':' -> addToken("COLON")
+            ';' -> addToken("SEMICOLON")
             '.' -> addToken("DOT")
+            '*' -> addToken("STAR")
             '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
+            '+' -> addToken(if (match('+')) "INCREMENT" else "PLUS")
+            '-' -> addToken(if(match('-')) "DECREMENT" else "MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
             '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
