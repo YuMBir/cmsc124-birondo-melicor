@@ -124,7 +124,7 @@ symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
        | "+" | "*" | "?" | "\n" | "\t" | "\r" | "\f" | "\b" ;
 
 character := letter | digit | symbol | "_" | " " ;
-identifier := letter , { letter | digit | "_" } ;
+identifier := letter , { letter | digit | "_" | "-" } ;
 
 expression := term
 term       ::= factor { ( PLUS | MINUS ) factor }
