@@ -176,7 +176,7 @@ class Scanner(private var source: String = "") {
             start = current
             scanToken()
         }
-        tokens.add(Token("EOF", "", line = line))
+        tokens.add(Token("EOF", "", startLine = line))
     }
     private fun scanToken(){ //hindi ko gin enum class
         when (val c = advance()){
