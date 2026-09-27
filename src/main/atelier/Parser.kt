@@ -85,11 +85,28 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
-        args.add(expression())
+        args.add(firstArg())
         while (match("COMMA")){
-            args.add(expression())
+            args.add(firstArg())
         }
         return Arguments(args)
+    }
+    fun firstArg(): Expr{
+        return logicAnd() //highest precedence for arguments here
+    }
+    fun logicAnd(): Expr{
+        var node = logicOr()
+        while (match("AND")){
+            node = Binary(node, previous(), logicOr())
+        }
+        return node
+    }
+    fun logicOr(): Expr{
+        var node = expression()
+        while (match("OR")){
+            node = Binary(node, previous(), expression())
+        }
+        return node
     }
     fun expression(): Expr{
         return addTerm()
@@ -109,7 +126,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return node
     }
     fun unaryTerm(): Expr{
-        if (match("MINUS")){
+        if (match("MINUS", "BANG")){
             var operator = previous()
             var operand = unaryTerm()
             return UnaryOp(operator, operand)

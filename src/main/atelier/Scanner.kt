@@ -178,7 +178,7 @@ class Scanner(private var source: String = "") {
             '-' -> addToken("MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
-            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
+            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "BANG")
             '/' -> {
                 if (match('/')){
                     while (peek() != '\n' && !isAtEnd())
