@@ -51,16 +51,17 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Operators
 
 
-| Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
-|----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
-| `(`, `)`                         | grouping                                             | binary            | left                | 10            |
-| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 5             |
-| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 4             |
+| Operator       | Category                                             | Operands          | Associativity       | Precedence    |
+|----------------|------------------------------------------------------|-------------------|---------------------|---------------|
+| `(`, `)`       | grouping                                             | binary            | left                | 10            |
+| `* `, `/`      | arithmetic, multiplicative                           | binary            | left                | 6             |
+| `+`, `-`       | arithmetic, additive                                 | binary            | left                | 5             |
+| `-`            | arithmetic, multiplicative                           | unary             | left                | 4             |
 | `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
-| `!`                              | logical                                              | binary   | left                | 2             |
-| `and`, `or`                      | logical                                              | binary   | left                | 2             |
-| `=`                               | assignment                                           | binary   | left                | 1             |
-| [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
+| `!`            | logical                                              | binary            | left                | 2             |
+| `and`, `or`    | logical                                              | binary            | left                | 2             |
+| `=`            | assignment                                           | binary            | left                | 1             |
+| [op]           | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
 ### Literals
@@ -126,9 +127,9 @@ symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
 character := letter | digit | symbol | "_" | " " ;
 identifier := letter , { letter | digit | "_" } ;
 
-expression := term
-term       ::= factor { ( PLUS | MINUS ) factor }
-factor     ::= primary { ( STAR | SLASH ) primary }
+expression := addTerm
+addTerm       ::= mulTerm { ( PLUS | MINUS ) mulTerm }
+mulTerm     ::= primary { ( STAR | SLASH ) primary }
 primary    ::= NUMBER | LEFT_PAREN expression RIGHT_PAREN 
 ```
 
