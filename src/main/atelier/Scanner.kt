@@ -61,12 +61,12 @@ class Scanner(private var source: String = "") {
         current++
         return true //consumes a match
     }
-    private fun addToken(type: String, literal: Any? = null, tokenLine: Int = line) { //added tokenLine: Int = line to avoid the buggy line number saved 
+    private fun addToken(type: String, literal: Any? = null, startLine: Int = line, endLine: Int = line) { //replaced tokenLine: Int = line
         val text = source.substring(start,current)
-        tokens.add(Token(type,text,literal,tokenLine))
+        tokens.add(Token(type,text,literal, startLine, endLine))// replace tokenLine with startLine and endLine
     }
     private fun identifier() {
-        while (peek().isLetterOrDigit()) advance() //looks through whole identifier
+        while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
         val type = keywords[text] ?: "IDENTIFIER" //keyword or identifier
         val literal: Any? = when (type) { //for the handling of boolean, true or false
@@ -93,10 +93,9 @@ class Scanner(private var source: String = "") {
         }
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
-    private fun isAllowedInString(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' 
-    private fun isDigit(c: Char) = c in '0'..'9'
+    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
 
-    private fun string(){
+    private fun string(){ 
         val startLine = line
         val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
         var valid = true
@@ -126,33 +125,18 @@ class Scanner(private var source: String = "") {
                 }
                 
             } else{ //for ordinary char
-                val c = advance()
-                when {
-                    c == '\n' -> sb.append(c) // raw newlines allowed
-                    c == '\r' && peek() == '\n' -> { /* skip, the '\n' is appended next */ }
-                    isDigit(c) -> {           // digits: always OK, but they start the trailing zone
-                        seenDigit = true
-                        sb.append(c)
+                    sb.append(advance())
                 }
-                    !isAllowedInString(c) -> {
-                        reportError(line, "Invalid character '$c' in string; only A-Z, a-z, and '_' allowed.")
-                        valid = false
-                    }
-                    seenDigit -> {            // a valid letter/underscore, but it comes after a digit
-                    reportError(line, "Character '$c' after digits; digits may only be trailing.")
-                    valid = false
-                }
-                    else -> sb.append(c)
-            }
-            }
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
-        } else {
-            advance()
-        }
+            addToken("STRING", source.substring(start+1, current))
+            return
+        } 
+        advance()
+        val endLine = line
         if (valid) {
-            addToken("STRING",  sb.toString(), startLine)
+            addToken("STRING",  sb.toString(), startLine, endLine)
         }
     }
 
@@ -176,7 +160,7 @@ class Scanner(private var source: String = "") {
             start = current
             scanToken()
         }
-        tokens.add(Token("EOF", "", startLine = line))
+        tokens.add(Token("EOF", "", startLine = line, endLine = line))
     }
     private fun scanToken(){ //hindi ko gin enum class
         when (val c = advance()){
@@ -189,8 +173,8 @@ class Scanner(private var source: String = "") {
             '.' -> addToken("DOT")
             '*' -> addToken("STAR")
             '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
-            '+' -> addToken(if (match('+')) "INCREMENT" else "PLUS")
-            '-' -> addToken(if(match('-')) "DECREMENT" else "MINUS")
+            '+' -> addToken("PLUS")
+            '-' -> addToken("MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
             '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
@@ -213,7 +197,7 @@ class Scanner(private var source: String = "") {
                 }
             }
             ' ', '\r', '\t' -> {}         //ignore whitespace
-            '\n' -> {}
+            '\n' -> addToken("NEWLINE")
             '"' -> string()
             else -> {
                 if (c.isLetter()) identifier()

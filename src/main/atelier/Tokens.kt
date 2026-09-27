@@ -7,10 +7,11 @@ data class Token(val type: String, private val lexeme: String, private val liter
         return "Token(type=$type, lexeme=${getLexeme()}, literal=${getLiteralString()}, line=$startLine:$endLine)\n"
     }
     fun getLexeme(): String {
-        if (type == "STRING"){
-            return literal.toString().replace("\n", "\\n")
-        }
-        return literal.toString()
+         when (type){
+             "STRING" -> return lexeme.replace("\n", "\\n")
+             "NEWLINE" -> return "\\n"
+         }
+        return lexeme
 
     }
     fun getLiteralString(): String {
