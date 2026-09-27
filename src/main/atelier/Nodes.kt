@@ -18,4 +18,10 @@ class Binary(val left: Expr, val operator:Token, val right: Expr) : Expr{
         return "(${operator.getLexeme()} $left $right)"
     }
 }
+class Unary(val operator: Token, val node: Expr) : Expr{
+    override fun toString(): String {
+        return "(${operator.getLexeme()} $node)"
+    }
+}
+
 
