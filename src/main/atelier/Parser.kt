@@ -65,16 +65,16 @@ class Parser(private var tokens: List<Token> = listOf()) {
     fun isAtEnd() = peek().getType() == "EOF"
 
     fun expression(): Expr{
-        return term()
+        return addTerm()
     }
-    fun term(): Expr{
-        var node = factor()
+    fun addTerm(): Expr{
+        var node = mulTerm()
         while (match("PLUS", "MINUS")){
-            node = Binary(node, previous(), factor())
+            node = Binary(node, previous(), mulTerm())
         }
         return node
     }
-    fun factor(): Expr{
+    fun mulTerm(): Expr{
         var node = primary()
         while (match("STAR", "SLASH")){
             node = Binary(node, previous(), primary())
