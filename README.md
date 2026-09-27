@@ -51,17 +51,18 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Operators
 
 
-| Operator       | Category                                             | Operands          | Associativity       | Precedence    |
-|----------------|------------------------------------------------------|-------------------|---------------------|---------------|
-| `(`, `)`       | grouping                                             | binary            | left                | 10            |
-| `* `, `/`      | arithmetic, multiplicative                           | binary            | left                | 6             |
-| `+`, `-`       | arithmetic, additive                                 | binary            | left                | 5             |
-| `-`            | arithmetic, multiplicative                           | unary             | left                | 4             |
-| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
-| `!`            | logical                                              | binary            | left                | 2             |
-| `and`, `or`    | logical                                              | binary            | left                | 2             |
-| `=`            | assignment                                           | binary            | left                | 1             |
-| [op]           | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
+| Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
+|----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
+| `(`, `)`                         | grouping                                             | binary            | left                | 10            |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 8             |
+| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 7             |
+| `-`                              | arithmetic, multiplicative                           | unary             | left                | 6             |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 5             |
+| `or`                             | logical                                              | binary            | left                | 4             |
+| `and`                      | logical                                              | binary            | left                | 3             |
+| `!`                              | logical                                              | unary             | left                | 2             |
+| `=`                              | assignment                                           | binary            | left                | 1             |
+| [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
 ### Literals
