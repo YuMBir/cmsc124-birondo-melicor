@@ -65,6 +65,7 @@ class Scanner(private var source: String = "") {
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal, startLine, endLine))// replace tokenLine with startLine and endLine
     }
+    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
     private fun identifier() {
         while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
@@ -93,7 +94,7 @@ class Scanner(private var source: String = "") {
         }
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
-    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
+    
 
     private fun string(){ 
         val startLine = line
@@ -125,7 +126,13 @@ class Scanner(private var source: String = "") {
                 }
                 
             } else{ //for ordinary char
-                    sb.append(advance())
+                    val ch = advance()
+                    if (ch == '\r'){
+                        if (peek() == '\n') advance()
+                        sb.append('\n')
+                    }else{
+                        sb.append(ch)
+                    }
                 }
         }
         if(isAtEnd()){ //loop exit because no input left
@@ -197,7 +204,7 @@ class Scanner(private var source: String = "") {
                 }
             }
             ' ', '\r', '\t' -> {}         //ignore whitespace
-            '\n' -> addToken("NEWLINE")
+            '\n' -> addToken("NEWLINE", startLine = line -1, endLine = line -1)
             '"' -> string()
             else -> {
                 if (c.isLetter()) identifier()
