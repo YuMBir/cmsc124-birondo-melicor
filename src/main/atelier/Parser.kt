@@ -36,14 +36,14 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     /**
-     * Returns current token
+     * Returns current + increment (default is 0) token
      */
-    fun peek(): Token{
-        return tokens[current]
+    fun peek(increment: Int = 0): Token{
+        return tokens[current + increment]
     }
 
     /**
-     * Checks token type and consumes.
+     * Checks token type and consumes if true, else returns false
      * Multiple token types can be used in the condition.
      */
     fun match(vararg type: String): Boolean{
@@ -89,11 +89,19 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return node
     }
     fun mulTerm(): Expr{
-        var node = primary()
+        var node = unaryTerm()
         while (match("STAR", "SLASH")){
-            node = Binary(node, previous(), primary())
+            node = Binary(node, previous(), unaryTerm())
         }
         return node
+    }
+    fun unaryTerm(): Expr{
+        if (match("MINUS")){
+            var operator = previous()
+            var operand = unaryTerm()
+            return UnaryOp(operator, operand)
+        }
+        return primary()
     }
     fun primary(): Expr{
         if (match("NUMBER")){
@@ -104,7 +112,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             consume("RIGHT_PAREN")
             return Group(node)
         }
-        fail("unexpected token: unterminated parenthesis")
+        fail("unexpected token at primary(): ${peek().getType()}")
     }
 }
 
