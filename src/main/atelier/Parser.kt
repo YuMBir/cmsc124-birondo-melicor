@@ -31,7 +31,8 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun parse(){
         while (!isAtEnd()) {
-            expressions.add(expression())
+            expressions.add(highest())
+            match("NEWLINE") // consume newline
         }
     }
 
@@ -78,6 +79,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun isAtEnd() = peek().getType() == "EOF"
 
+    fun highest(): Expr{
+        return arguments()
+    }
+
+    fun arguments(): Expr{
+        var args = mutableListOf<Expr>()
+        args.add(expression())
+        while (match("COMMA")){
+            args.add(expression())
+        }
+        return Arguments(args)
+    }
     fun expression(): Expr{
         return addTerm()
     }

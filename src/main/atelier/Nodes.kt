@@ -3,6 +3,12 @@ package atelier
 sealed interface Expr{
     override fun toString(): String
 }
+class Arguments(private val expressions: List<Expr>) : Expr{
+    override fun toString(): String{
+        return expressions.joinToString(separator = ", ", prefix = "(args ", postfix = ")")
+    }
+}
+
 class Group(val node: Expr) : Expr{
     override fun toString(): String {
         return "(group $node)"
