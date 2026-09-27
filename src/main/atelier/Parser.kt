@@ -35,10 +35,17 @@ class Parser(private var tokens: List<Token> = listOf()) {
         }
     }
 
+    /**
+     * Returns current token
+     */
     fun peek(): Token{
         return tokens[current]
     }
 
+    /**
+     * Checks token type and consumes.
+     * Multiple token types can be used in the condition.
+     */
     fun match(vararg type: String): Boolean{
         if (peek().getType() in type){
             consume(*type)
@@ -49,6 +56,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
         }
     }
 
+    /**
+     * Advances to next token.
+     * Returns error if token type is incorrect.
+     */
     fun consume(vararg type: String): Token{
         if (peek().getType() in type){
             return tokens[current++]
@@ -58,6 +69,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
         }
     }
 
+    /**
+     * Returns last consumed token.
+     */
     fun previous(): Token{
         return tokens[current - 1]
     }
