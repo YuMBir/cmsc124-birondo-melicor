@@ -25,11 +25,10 @@ class Scanner(private var source: String = "") {
 
     var hadError = false
     private val keywords = mapOf( //added keywords for loops, and boolean
-        "var" to "VAR",
-        "print" to "PRINT", 
-        "for" to "FOR",
-        "while" to "WHILE",
-        "if" to "IF",
+        "manifest" to "MANIFEST",
+        "recast" to "RECAST",
+        "etch" to "ETCH",
+        "scry" to "SCRY",
         "else" to "ELSE",
         "true" to "TRUE",
         "false" to "FALSE",
@@ -194,7 +193,7 @@ class Scanner(private var source: String = "") {
             '-' -> addToken("MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
-            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
+            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "BANG")
             '/' -> {
                 if (match('/')){
                     while (peek() != '\n' && !isAtEnd())
