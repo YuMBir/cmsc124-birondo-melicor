@@ -7,8 +7,9 @@
 
 ## Overview
 
-Atelier is a programming language designed for sorcerers, wizards, and other spellcasters that wish to experiment on their arcane innovations without the risk of permanently damaging the arcane weave itself should their spells go wrong. The language acts like the virtual arcane weave, producing at output that shows what would happen should they actually cast the spell they wrote. It uses terms and concepts mages would be familiar with in their day-to-day work. 
-
+Greetings wizard! Found yourself in the modern world without any place to utilize the skills and theory you've built up?  
+Worry not! Atelier provides a programming language for you and your archaic companions to use your skills in the modern world!  
+You see, programming is no different from casting a spell
 ## Host language and build
 
 - Host language: Kotlin 2.0.20
@@ -40,11 +41,21 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Keywords
 
 
-| Keyword  | Purpose                                                              |
-|----------|----------------------------------------------------------------------|
-| `circle` | blueprint for producing a spell, much like a class creates an object |
-| `sigil`  | stores information used in spells, like a variable                   |
-| `imbue`  | [not sure yet]                                                       |
+| Keyword    | Purpose                                    |
+|------------|--------------------------------------------|
+| `imbue`    | [not sure yet]                             |
+| `circle`   | function declaration                       |
+| `sigil`    | variable                                   |
+| `whilst`   | while loop                                 |
+| `manifest` | return for functions                       |
+| `scry`     | condition checker, basically an if         |
+| `else`     | default condition for scry                 |
+| `invoke`   | used to call circles                       |
+| `etch`     | prints to console for diagonistic purposes |
+
+
+
+
 
 
 
@@ -54,12 +65,14 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 | Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
 |----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
 | `(`, `)`                         | grouping                                             | binary            | left                | 10            |
-| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 4             |
-| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 4             |
-| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
-| `!`                              | logical                                              | binary   | left                | 2             |
-| `and`, `or`                      | logical                                              | binary   | left                | 2             |
-| `=`                               | assignment                                           | binary   | left                | 1             |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 8             |
+| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 7             |
+| `-`                              | arithmetic, negation                                 | unary             | left                | 6             |
+| `!`                              | logical, negation                                    | unary             | left                | 6             |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 5             |
+| `or`                             | logical                                              | binary            | left                | 4             |
+| `and`                      | logical                                              | binary            | left                | 3             |
+| `=`                              | assignment                                           | binary            | left                | 1             |
 | [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
@@ -77,7 +90,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Identifiers
 
 - Start characters: `a-z`, `A-Z`
-- Continue characters: `a-z`, `A-Z`, `0-9`, `_`
+- Continue characters: `a-z`, `A-Z`, `0-9`, `_`, `-`
 - Case-sensitive: YES
 - [Reserved patterns, length limits, or other restrictions.]
 
@@ -92,7 +105,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ## Whitespace and termination
 
 - Whitespace significant: Not significant (so far)
-- Statement terminator: Newline `\n`
+- Statement terminator: Newline `\n`, `\r\n` or `;`
 - Block delimiters: `{}`
 - Grouping delimiters: `()`
 
@@ -126,9 +139,9 @@ symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
 character := letter | digit | symbol | "_" | " " ;
 identifier := letter , { letter | digit | "_" | "-" } ;
 
-expression := term
-term       ::= factor { ( PLUS | MINUS ) factor }
-factor     ::= primary { ( STAR | SLASH ) primary }
+expression := addTerm
+addTerm       ::= mulTerm { ( PLUS | MINUS ) mulTerm }
+mulTerm     ::= primary { ( STAR | SLASH ) primary }
 primary    ::= NUMBER | LEFT_PAREN expression RIGHT_PAREN 
 ```
 
