@@ -54,12 +54,14 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 | Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
 |----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
 | `(`, `)`                         | grouping                                             | binary            | left                | 10            |
-| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 4             |
-| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 4             |
-| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 3             |
-| `!`                              | logical                                              | binary   | left                | 2             |
-| `and`, `or`                      | logical                                              | binary   | left                | 2             |
-| `=`                               | assignment                                           | binary   | left                | 1             |
+| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 8             |
+| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 7             |
+| `-`                              | arithmetic, negation                                 | unary             | left                | 6             |
+| `!`                              | logical, negation                                    | unary             | left                | 6             |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 5             |
+| `or`                             | logical                                              | binary            | left                | 4             |
+| `and`                      | logical                                              | binary            | left                | 3             |
+| `=`                              | assignment                                           | binary            | left                | 1             |
 | [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
@@ -126,9 +128,9 @@ symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
 character := letter | digit | symbol | "_" | " " ;
 identifier := letter , { letter | digit | "_" | "-" } ;
 
-expression := term
-term       ::= factor { ( PLUS | MINUS ) factor }
-factor     ::= primary { ( STAR | SLASH ) primary }
+expression := addTerm
+addTerm       ::= mulTerm { ( PLUS | MINUS ) mulTerm }
+mulTerm     ::= primary { ( STAR | SLASH ) primary }
 primary    ::= NUMBER | LEFT_PAREN expression RIGHT_PAREN 
 ```
 
@@ -261,4 +263,3 @@ approval of your own work.]
 | Activity | What changed in the language |
 |---|---|
 | Lab 1 | [entry] |
-
