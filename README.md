@@ -90,7 +90,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Identifiers
 
 - Start characters: `a-z`, `A-Z`
-- Continue characters: `a-z`, `A-Z`, `0-9`, `_`
+- Continue characters: `a-z`, `A-Z`, `0-9`, `_`, `-`
 - Case-sensitive: YES
 - [Reserved patterns, length limits, or other restrictions.]
 
@@ -105,7 +105,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ## Whitespace and termination
 
 - Whitespace significant: Not significant (so far)
-- Statement terminator: Newline `\n`
+- Statement terminator: Newline `\n`, `\r\n` or `;`
 - Block delimiters: `{}`
 - Grouping delimiters: `()`
 
