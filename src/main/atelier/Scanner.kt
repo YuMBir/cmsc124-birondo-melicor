@@ -83,15 +83,25 @@ class Scanner(private var source: String = "") {
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
             while (peek().isDigit()) advance()
+        }else if (peek() == '.' && peekNext().isLetter()){ //for 3.toString
+            advance()
+            while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance()
+            reportError(line, "Invalid, letter after a decimal point.")
+            return
         }
+        if (peek().isLetter()){ //for the 3variable
+            while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance()
+            reportError(line, "Identifier starts with a number.")
+            return
+        }
+
         val value = source.substring(start, current)
         val d = value.toDoubleOrNull()//added this, for more checking in the number... to be elaborated
         if (d == null) {
             reportError(line,"Invalid number literal '$value'.")
-            addToken("NUMBER", 0.0)
-        } else{
-            addToken("NUMBER", d)
-        }
+            return
+        } 
+        addToken("NUMBER", d)
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
     
