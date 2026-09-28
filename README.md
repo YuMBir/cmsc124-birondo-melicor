@@ -112,7 +112,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ## Token output format
 
 ```
-[one line of real --tokenize output]
+Token(type=STRING, lexeme="this is\na multiline", literal=this is\na multiline, line=1:2)
 ```
 
 [What each field means. Frozen as of Lab 1; changes are recorded in the
