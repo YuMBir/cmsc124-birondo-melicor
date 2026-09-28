@@ -25,11 +25,10 @@ class Scanner(private var source: String = "") {
 
     var hadError = false
     private val keywords = mapOf( //added keywords for loops, and boolean
-        "var" to "VAR",
-        "print" to "PRINT", 
-        "for" to "FOR",
-        "while" to "WHILE",
-        "if" to "IF",
+        "manifest" to "MANIFEST",
+        "whilst" to "WHILST",
+        "etch" to "ETCH",
+        "scry" to "SCRY",
         "else" to "ELSE",
         "true" to "TRUE",
         "false" to "FALSE",
@@ -65,6 +64,7 @@ class Scanner(private var source: String = "") {
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal, startLine, endLine))// replace tokenLine with startLine and endLine
     }
+    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
     private fun identifier() {
         while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
@@ -82,18 +82,28 @@ class Scanner(private var source: String = "") {
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
             while (peek().isDigit()) advance()
+        }else if (peek() == '.' && peekNext().isLetter()){ //for 3.toString
+            advance()
+            while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance()
+            reportError(line, "Invalid, letter after a decimal point.")
+            return
         }
+        if (peek().isLetter()){ //for the 3variable
+            while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance()
+            reportError(line, "Identifier starts with a number.")
+            return
+        }
+
         val value = source.substring(start, current)
         val d = value.toDoubleOrNull()//added this, for more checking in the number... to be elaborated
         if (d == null) {
             reportError(line,"Invalid number literal '$value'.")
-            addToken("NUMBER", 0.0)
-        } else{
-            addToken("NUMBER", d)
-        }
+            return
+        } 
+        addToken("NUMBER", d)
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
-    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
+    
 
     private fun string(){ 
         val startLine = line
@@ -125,7 +135,13 @@ class Scanner(private var source: String = "") {
                 }
                 
             } else{ //for ordinary char
-                    sb.append(advance())
+                    val ch = advance()
+                    if (ch == '\r'){
+                        if (peek() == '\n') advance()
+                        sb.append('\n')
+                    }else{
+                        sb.append(ch)
+                    }
                 }
         }
         if(isAtEnd()){ //loop exit because no input left
@@ -177,7 +193,7 @@ class Scanner(private var source: String = "") {
             '-' -> addToken("MINUS")
             '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
             '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
-            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "NOT")
+            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "BANG")
             '/' -> {
                 if (match('/')){
                     while (peek() != '\n' && !isAtEnd())
@@ -197,7 +213,7 @@ class Scanner(private var source: String = "") {
                 }
             }
             ' ', '\r', '\t' -> {}         //ignore whitespace
-            '\n' -> addToken("NEWLINE")
+            '\n' -> addToken("NEWLINE", startLine = line -1, endLine = line -1)
             '"' -> string()
             else -> {
                 if (c.isLetter()) identifier()
