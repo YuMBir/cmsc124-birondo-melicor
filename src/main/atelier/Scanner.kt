@@ -26,7 +26,7 @@ class Scanner(private var source: String = "") {
     var hadError = false
     private val keywords = mapOf( //added keywords for loops, and boolean
         "manifest" to "MANIFEST",
-        "recast" to "RECAST",
+        "whilst" to "WHILST",
         "etch" to "ETCH",
         "scry" to "SCRY",
         "else" to "ELSE",

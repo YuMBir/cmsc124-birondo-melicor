@@ -4,6 +4,6 @@
 3.14
 @
 // a comment
-var x = 5
+sigil x = 5
 "\""
 thi\s is a str\ing

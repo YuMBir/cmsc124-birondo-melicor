@@ -1,4 +1,4 @@
-for (var i = 0; i < 10; i++) { // increment i
+whilst (sigil i > 3) { // this is a loop
     /* skip this */
     print i;
 }
