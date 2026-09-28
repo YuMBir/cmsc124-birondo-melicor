@@ -11,7 +11,7 @@ data class Token(val type: String, private val lexeme: String, private val liter
              "STRING" -> return lexeme.replace(Regex("[\\n\\r\\t]")){
                  when (it.value){
                      "\n" -> "\\n"
-                     "\r" -> "\\r"
+                     "\r" -> ""
                      "\t" -> "\\t"
                      else -> it.value
                  }
@@ -26,7 +26,7 @@ data class Token(val type: String, private val lexeme: String, private val liter
             return literal.toString().replace(Regex("[\\n\\r\\t]")){
                 when (it.value){
                     "\n" -> "\\n"
-                    "\r" -> "\\r"
+                    "\r" -> ""
                     "\t" -> "\\t"
                     else -> it.value
                 }

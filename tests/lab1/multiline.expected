@@ -1,4 +1,4 @@
-Token(type=STRING, lexeme="this is\r\na multiline", literal=this is\na multiline, line=1:2)
+Token(type=STRING, lexeme="this is\na multiline", literal=this is\na multiline, line=1:2)
 Token(type=NEWLINE, lexeme=\n, literal=null, line=2:2)
 Token(type=STRING, lexeme="hello\nworld", literal=hello\nworld, line=3:3)
 Token(type=EOF, lexeme=, literal=null, line=3:3)
