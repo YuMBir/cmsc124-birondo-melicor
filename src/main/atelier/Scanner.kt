@@ -186,6 +186,7 @@ class Scanner(private var source: String = "") {
             '}' -> addToken("RIGHT_BRACE")
             ':' -> addToken("COLON")
             ';' -> addToken("SEMICOLON")
+            ',' -> addToken("COMMA")
             '.' -> addToken("DOT")
             '*' -> addToken("STAR")
             '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
@@ -228,9 +229,14 @@ class Scanner(private var source: String = "") {
         tokens.clear()
     }
 
+    fun getTokenList(): List<Token>{
+        return tokens
+    }
+
     fun printTokens() {
         for (token in tokens) {
             System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
         }
     }
+
 }
