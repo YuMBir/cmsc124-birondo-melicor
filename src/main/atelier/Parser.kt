@@ -92,21 +92,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return Arguments(args)
     }
     fun firstArg(): Expr{
-        return equality() //highest precedence for arguments here
-    }
-    fun equality(): Expr{
-        var node = relational()
-        while (match ("EQUAL_EQUAL", "NOT_EQUAL")){
-            node = Binary(node, previous(), relational())
-        }
-        return node
-    }
-    fun relational(): Expr{
-        var node = logicAnd()
-        while (match("GREATER", "GREATER_EQUAL", "LESS", "LESS_EQUAL")){
-            node = Binary(node, previous(), logicAnd())
-        }
-        return node
+        return logicAnd() //highest precedence for arguments here
     }
     fun logicAnd(): Expr{
         var node = logicOr()
@@ -116,12 +102,27 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return node
     }
     fun logicOr(): Expr{
-        var node = expression()
+        var node = equality()
         while (match("OR")){
+            node = Binary(node, previous(), equality())
+        }
+        return node
+    }
+    fun equality(): Expr{
+        var node = relational()
+        while (match ("EQUAL_EQUAL", "NOT_EQUAL")){
+            node = Binary(node, previous(), relational())
+        }
+        return node
+    }
+    fun relational(): Expr{
+        var node = expression()
+        while (match("GREATER", "GREATER_EQUAL", "LESS", "LESS_EQUAL")){
             node = Binary(node, previous(), expression())
         }
         return node
     }
+
     fun expression(): Expr{
         return addTerm()
     }
@@ -148,8 +149,8 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return primary()
     }
     fun primary(): Expr{
-        if (match("NUMBER")){
-            return Literal(previous().getLiteralValue()!!)
+        if (match("NUMBER", "TRUE", "FALSE", "NIL")){
+            return Literal(previous())
         }
         if (match("LEFT_PAREN")){
             val node = expression()
