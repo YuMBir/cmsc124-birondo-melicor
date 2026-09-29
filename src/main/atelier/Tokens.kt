@@ -8,14 +8,28 @@ data class Token(private val type: String, private val lexeme: String, private v
     }
     fun getLexeme(): String {
          when (type){
-             "STRING" -> return lexeme.replace("\n", "\\n")
+             "STRING" -> return lexeme.replace(Regex("[\\n\\r\\t]")){
+                 when (it.value){
+                     "\n" -> "\\n"
+                     "\r" -> ""
+                     "\t" -> "\\t"
+                     else -> it.value
+                 }
+             }
              "NEWLINE" -> return "\\n"
          }
         return lexeme
     }
     fun getLiteralString(): String {
         if (type == "STRING"){
-            return literal.toString().replace("\n", "\\n")
+            return literal.toString().replace(Regex("[\\n\\r\\t]")){
+                when (it.value){
+                    "\n" -> "\\n"
+                    "\r" -> ""
+                    "\t" -> "\\t"
+                    else -> it.value
+                }
+            }
         }
         return literal.toString()
     }

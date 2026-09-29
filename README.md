@@ -7,8 +7,11 @@
 
 ## Overview
 
-Atelier is a programming language designed for sorcerers, wizards, and other spellcasters that wish to experiment on their arcane innovations without the risk of permanently damaging the arcane weave itself should their spells go wrong. The language acts like the virtual arcane weave, producing at output that shows what would happen should they actually cast the spell they wrote. It uses terms and concepts mages would be familiar with in their day-to-day work. 
+Greetings wizard! Found yourself in the modern world without any place to utilize the skills and theory you've built up?  
+Worry not! Atelier provides a programming language for you and your archaic companions to use your skills in the modern world!  
+You see, programming is no different from casting a spell.
 
+It follows a functional programming approach.
 ## Host language and build
 
 - Host language: Kotlin 2.0.20
@@ -40,11 +43,21 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Keywords
 
 
-| Keyword  | Purpose                                                              |
-|----------|----------------------------------------------------------------------|
-| `circle` | blueprint for producing a spell, much like a class creates an object |
-| `sigil`  | stores information used in spells, like a variable                   |
-| `imbue`  | [not sure yet]                                                       |
+| Keyword    | Purpose                                    |
+|------------|--------------------------------------------|
+| `imbue`    | [not sure yet]                             |
+| `circle`   | function declaration                       |
+| `sigil`    | variable                                   |
+| `whilst`   | while loop                                 |
+| `manifest` | return for functions                       |
+| `scry`     | condition checker, basically an if         |
+| `else`     | default condition for scry                 |
+| `invoke`   | used to call circles                       |
+| `etch`     | prints to console for diagonistic purposes |
+
+
+
+
 
 
 
@@ -79,7 +92,7 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Identifiers
 
 - Start characters: `a-z`, `A-Z`
-- Continue characters: `a-z`, `A-Z`, `0-9`, `_`
+- Continue characters: `a-z`, `A-Z`, `0-9`, `_`, `-`
 - Case-sensitive: YES
 - [Reserved patterns, length limits, or other restrictions.]
 
@@ -94,18 +107,24 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ## Whitespace and termination
 
 - Whitespace significant: Not significant (so far)
-- Statement terminator: Newline `\n`
+- Statement terminator: Newline `\n` or `;`  
+*Line breaks are normalized to `LF` on file read*
 - Block delimiters: `{}`
 - Grouping delimiters: `()`
 
 ## Token output format
 
 ```
-[one line of real --tokenize output]
+Token(type=STRING, lexeme="this is\na multiline", literal=this is\na multiline, line=1:2)
 ```
 
 [What each field means. Frozen as of Lab 1; changes are recorded in the
 changelog.]
+
+- type = token type
+- lexeme = the string that was read
+- literal = literal meaning of the string
+- line = formatted as startline:endline, mainly utilized by multiline strings
 
 ## Grammar
 

@@ -1,2 +1,2 @@
-while (a <= b and a >= 0) {}
-if (a or b)
+whilst (a <= b and a >= 0) {}
+scry (a or b)

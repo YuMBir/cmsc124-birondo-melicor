@@ -57,7 +57,8 @@ fun scanCode(path: String): String{
     } catch (error: Exception) {
         fail("cannot read '$path': ${error.message}")
     }
-    return source
+
+    return source.replace(Regex("\r\n?"), "\n")
 }
 
 //REPL

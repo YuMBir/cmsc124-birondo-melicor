@@ -1,5 +1,5 @@
-var value = 10
-var number = 10
-print value == number
-print true
-print !false
+sigil value = 10
+sigil number = 10
+etch value == number
+etch true
+etch !false

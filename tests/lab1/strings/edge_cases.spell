@@ -4,5 +4,5 @@
 007
 5.
 .5
-var greeting="hello"
+sigil greeting="hello"
 // trailing comment
