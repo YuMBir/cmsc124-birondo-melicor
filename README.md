@@ -64,18 +64,19 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ### Operators
 
 
-| Operator                         | Category                                             | Operands          | Associativity       | Precedence    |
-|----------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
-| `(`, `)`                         | grouping                                             | binary            | left                | 10            |
-| `* `, `/`                        | arithmetic, multiplicative                           | binary            | left                | 8             |
-| `+`, `-`                         | arithmetic, additive                                 | binary            | left                | 7             |
-| `-`                              | arithmetic, negation                                 | unary             | left                | 6             |
-| `!`                              | logical, negation                                    | unary             | left                | 6             |
-| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison                                           | binary            | left                | 5             |
-| `or`                             | logical                                              | binary            | left                | 4             |
-| `and`                      | logical                                              | binary            | left                | 3             |
-| `=`                              | assignment                                           | binary            | left                | 1             |
-| [op]                             | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
+| Operator                        | Category                                             | Operands          | Associativity       | Precedence    |
+|---------------------------------|------------------------------------------------------|-------------------|---------------------|---------------|
+| `(`, `)`                        | grouping                                             | binary            | left                | 1             |
+| `* `, `/`                       | arithmetic, multiplicative                           | binary            | left                | 2             |
+| `+`, `-`                        | arithmetic, additive                                 | binary            | left                | 3             |
+| `-`                             | arithmetic, negation                                 | unary             | left                | 4             |
+| `!`                             | logical, negation                                    | unary             | left                | 4             |
+| `==`, `!=` | comparison, relational                               | binary            | left                | 5             |
+| `<`, `>`, `>=`, `<=`, `==`, `!=` | comparison, relational                               | binary            | left                | 6             |
+| `or`                            | logical                                              | binary            | left                | 7             |
+| `and`                     | logical                                              | binary            | left                | 8             |
+| `=`                             | assignment                                           | binary            | left                | 15            |
+| [op]                            | [arithmetic, comparison, logical, assignment, other] | [unary or binary] | [left, right, none] | [1 = loosest] |
 
 
 ### Literals
