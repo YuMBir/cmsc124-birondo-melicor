@@ -103,40 +103,27 @@ class Scanner(private var source: String = "") {
         val startLine = line
         val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
         var valid = true
-        var seenDigit = false
-
         while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
             if ( peek() == '\\'){ //if the char is the start of an escape sequence
                 advance() //consume backlash, not adding to sb
                 if (isAtEnd()) { //backlash is the last char in the file
                     break
                 }
-                val e = advance()
-                if (seenDigit) {
-                    reportError(line, "Escape '\\$e' not allowed after digits; digits may only be trailing.")
-                    valid = false
-                }else{
-                    when (e){ //checks the char after backslash
+                when (val e = advance()){ //checks the char after backslash
                     'n' -> sb.append('\n')
                     't' -> sb.append('\t')
-                    '"' -> sb.append('"')   
+                    '"' -> sb.append('"')
                     '\\' -> sb.append('\\')
-                    else -> { 
+                    else -> {
                         reportError(line, "Unkown escape '\\$e'.") //report unknown escape
                         valid=false
                     } //unknown escape: nothing appended, string will be rejected
                 }
-                }
                 
-            } else{ //for ordinary char
-                    val ch = advance()
-                    if (ch == '\r'){
-                        if (peek() == '\n') advance()
-                        sb.append('\n')
-                    }else{
-                        sb.append(ch)
-                    }
-                }
+            }
+            else{ //for ordinary char
+                    sb.append(advance())
+            }
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
@@ -173,7 +160,7 @@ class Scanner(private var source: String = "") {
     }
     private fun scanToken(){ //decides what type of token
         when (val c = advance()){
-           '(' -> addToken("LEFT_PAREN")
+            '(' -> addToken("LEFT_PAREN")
             ')' -> addToken("RIGHT_PAREN")
             '{' -> addToken("LEFT_BRACE")
             '}' -> addToken("RIGHT_BRACE")
@@ -197,11 +184,13 @@ class Scanner(private var source: String = "") {
                     }
                     if (isAtEnd()){ //not finished /* */
                         reportError(line, "Unterminated block comment.")
-                    } else {
+                    }
+                    else {
                         advance() //consumes *
                         advance() //skip a character inside the comment
                     }
-                }else {
+                }
+                else {
                     addToken("SLASH") // for non comments
                 }
             }
@@ -212,7 +201,7 @@ class Scanner(private var source: String = "") {
                 if (c.isLetter()) identifier()
                 else if (c.isDigit()) number()
                 else reportError(line, "Unexpected character '$c'.")
-        }
+            }
         }
     }
     //for REPL
