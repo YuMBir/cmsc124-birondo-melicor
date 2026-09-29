@@ -2,12 +2,6 @@ package atelier
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
-//use this for scanner errors, it's good practice to have separate fail functions so we know where the error comes from
-private fun fail(message: String): Nothing {
-    System.err.println("Scanner: $message")
-    exitProcess(65)
-}
-
 //scanner class so that we don't have to keep passing values
 class Scanner(private var source: String = "") {
     var tokens = mutableListOf<Token>()
