@@ -92,18 +92,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return Arguments(args)
     }
     fun firstArg(): Expr{
-        return logicAnd() //highest precedence for arguments here
+        return logicOr() //highest precedence for arguments here
     }
-    fun logicAnd(): Expr{
-        var node = logicOr()
-        while (match("AND")){
-            node = Binary(node, previous(), logicOr())
+    fun logicOr(): Expr{
+        var node = logicAnd()
+        while (match("OR")){
+            node = Binary(node, previous(), logicAnd())
         }
         return node
     }
-    fun logicOr(): Expr{
+    fun logicAnd(): Expr{
         var node = equality()
-        while (match("OR")){
+        while (match("AND")){
             node = Binary(node, previous(), equality())
         }
         return node
