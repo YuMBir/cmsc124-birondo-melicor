@@ -37,7 +37,6 @@ fun run(source: String, mode: String = "--print") {
     val atelierScanner = Scanner(source)
     atelierScanner.tokenize()
     val tokens = atelierScanner.getTokenList()
-    if (atelierScanner.hadError) exitProcess(65) //added this
     when (mode) {
         "--print" -> atelierScanner.printCode() //default mode
         "--tokenize" -> atelierScanner.printTokens()
