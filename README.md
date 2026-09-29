@@ -118,6 +118,11 @@ Token(type=STRING, lexeme="this is\na multiline", literal=this is\na multiline, 
 [What each field means. Frozen as of Lab 1; changes are recorded in the
 changelog.]
 
+- type = token type
+- lexeme = the string that was read
+- literal = literal meaning of the string
+- line = formatted as startline:endline, mainly utilized by multiline strings
+
 ## Grammar
 
 ```
