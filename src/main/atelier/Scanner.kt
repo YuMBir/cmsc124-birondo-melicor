@@ -73,7 +73,7 @@ class Scanner(private var source: String = "") {
     private fun number() { //this is for dealing with numbers, updated to deal with number format errors
         while (peek().isDigit()) advance()// consume the integer part
 
-        if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
+        if (peek() == '.' && peekNext().isDigit()) { //if decimal point
             advance() // consume the '.'
             while (peek().isDigit()) advance()
         }else if (peek() == '.' && peekNext().isLetter()){ //for 3.toString
