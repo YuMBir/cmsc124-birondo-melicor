@@ -24,7 +24,7 @@ class Scanner(private var source: String = "") {
     }
 
     var hadError = false
-    private val keywords = mapOf( //added keywords for loops, and boolean
+    private val keywords = mapOf( //keywords of our language
         "manifest" to "MANIFEST",
         "whilst" to "WHILST",
         "etch" to "ETCH",
@@ -77,7 +77,7 @@ class Scanner(private var source: String = "") {
         addToken(type, literal)
     }
     private fun number() { //this is for dealing with numbers, updated to deal with number format errors
-        while (peek().isDigit()) advance()// handles decimal point
+        while (peek().isDigit()) advance()// consume the integer part
 
         if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
             advance() // consume the '.'
@@ -130,7 +130,7 @@ class Scanner(private var source: String = "") {
                     else -> { 
                         reportError(line, "Unkown escape '\\$e'.") //report unknown escape
                         valid=false
-                    } //the unknown char will recorded, to not lose the data
+                    } //unknown escape: nothing appended, string will be rejected
                 }
                 }
                 
@@ -163,14 +163,13 @@ class Scanner(private var source: String = "") {
         //replace the message for fa-il(), to not directly call exitProcess, just print the the error and keep running
         System.err.println("[line $line] Error: $message")
     }
-//fail("[line $line] Error: $message")
 
 
-    fun printCode(){ //just prints the code in the file line by line
+    fun printCode(){ //prints the entire source as UTF-8
         System.out.write(source.toByteArray(StandardCharsets.UTF_8))
     }
 
-    //write token scanner here
+    //turn source text into a list of tokens
     fun tokenize(){
         while (!isAtEnd()){
             start = current
@@ -178,7 +177,7 @@ class Scanner(private var source: String = "") {
         }
         tokens.add(Token("EOF", "", startLine = line, endLine = line))
     }
-    private fun scanToken(){ //hindi ko gin enum class
+    private fun scanToken(){ //decides what type of token
         when (val c = advance()){
            '(' -> addToken("LEFT_PAREN")
             ')' -> addToken("RIGHT_PAREN")
@@ -206,7 +205,7 @@ class Scanner(private var source: String = "") {
                         reportError(line, "Unterminated block comment.")
                     } else {
                         advance() //consumes *
-                        advance() //consumes /
+                        advance() //skip a character inside the comment
                     }
                 }else {
                     addToken("SLASH") // for non comments
