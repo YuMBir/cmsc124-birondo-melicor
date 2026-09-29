@@ -1,0 +1,3 @@
+(args (and (and true false) true))
+(args (and (> 3.0 4.0) (== 2.0 6.0)))
+(args (or (and true false) (and true false)))
