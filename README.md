@@ -9,7 +9,9 @@
 
 Greetings wizard! Found yourself in the modern world without any place to utilize the skills and theory you've built up?  
 Worry not! Atelier provides a programming language for you and your archaic companions to use your skills in the modern world!  
-You see, programming is no different from casting a spell
+You see, programming is no different from casting a spell.
+
+It follows a functional programming approach.
 ## Host language and build
 
 - Host language: Kotlin 2.0.20
@@ -105,7 +107,8 @@ Exit codes: 0 script successfully executes, 65 [when], 70 [when].
 ## Whitespace and termination
 
 - Whitespace significant: Not significant (so far)
-- Statement terminator: Newline `\n`, `\r\n` or `;`
+- Statement terminator: Newline `\n` or `;`  
+*Line breaks are normalized to `LF` on file read*
 - Block delimiters: `{}`
 - Grouping delimiters: `()`
 
