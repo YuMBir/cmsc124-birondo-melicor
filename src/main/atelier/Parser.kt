@@ -3,7 +3,7 @@ package atelier
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
-private fun fail(message: String): Nothing {
+private fun reportError(message: String): Nothing {
     System.err.println("Parser: $message")
     exitProcess(65)
 }
@@ -66,7 +66,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return tokens[current++]
         }
         else{
-            fail("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
+            reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -92,11 +92,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return Arguments(args)
     }
     fun firstArg(): Expr{
-        return comparison() //highest precedence for arguments here
+        return equality() //highest precedence for arguments here
     }
-    fun comparison(): Expr{
+    fun equality(): Expr{
+        var node = relational()
+        while (match ("EQUAL_EQUAL", "NOT_EQUAL")){
+            node = Binary(node, previous(), relational())
+        }
+        return node
+    }
+    fun relational(): Expr{
         var node = logicAnd()
-        while (match("EQUAL_EQUAL", "GREATER", "GREATER_EQUAL", "LESS", "LESS_EQUAL", "NOT_EQUAL")){
+        while (match("GREATER", "GREATER_EQUAL", "LESS", "LESS_EQUAL")){
             node = Binary(node, previous(), logicAnd())
         }
         return node
@@ -149,7 +156,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             consume("RIGHT_PAREN")
             return Group(node)
         }
-        fail("unexpected token at primary(): ${peek().getType()}")
+        reportError("unexpected token at primary(): ${peek().getType()}")
     }
 }
 
