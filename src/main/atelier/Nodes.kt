@@ -13,9 +13,9 @@ class Group(val node: Expr) : Expr{
         return "(group $node)"
     }
 }
-class Literal(val literal: Any) : Expr{
+class Literal(val token: Token) : Expr{
     override fun toString(): String {
-        return literal.toString()
+        return token.getLiteralString()
     }
 }
 class Binary(val left: Expr, val operator:Token, val right: Expr) : Expr{
