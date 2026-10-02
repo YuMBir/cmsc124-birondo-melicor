@@ -2,12 +2,6 @@ package atelier
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
-//use this for scanner errors, it's good practice to have separate fail functions so we know where the error comes from
-private fun fail(message: String): Nothing {
-    System.err.println("Scanner: $message")
-    exitProcess(65)
-}
-
 //scanner class so that we don't have to keep passing values
 class Scanner(private var source: String = "") {
     var tokens = mutableListOf<Token>()
@@ -24,7 +18,7 @@ class Scanner(private var source: String = "") {
     }
 
     var hadError = false
-    private val keywords = mapOf( //added keywords for loops, and boolean
+    private val keywords = mapOf( //keywords of our language
         "manifest" to "MANIFEST",
         "whilst" to "WHILST",
         "etch" to "ETCH",
@@ -77,9 +71,9 @@ class Scanner(private var source: String = "") {
         addToken(type, literal)
     }
     private fun number() { //this is for dealing with numbers, updated to deal with number format errors
-        while (peek().isDigit()) advance()// handles decimal point
+        while (peek().isDigit()) advance()// consume the integer part
 
-        if (peek() == '.' && peekNext().isDigit()) { //if decimal poimt
+        if (peek() == '.' && peekNext().isDigit()) { //if decimal point
             advance() // consume the '.'
             while (peek().isDigit()) advance()
         }else if (peek() == '.' && peekNext().isLetter()){ //for 3.toString
@@ -109,40 +103,27 @@ class Scanner(private var source: String = "") {
         val startLine = line
         val sb = StringBuilder() // holds the decoded value, escapes are already resolved by the time a char lands here
         var valid = true
-        var seenDigit = false
-
         while (peek()!= '"' && !isAtEnd()){ //this goes on until a closing quote is found/ run out of input to peek
             if ( peek() == '\\'){ //if the char is the start of an escape sequence
                 advance() //consume backlash, not adding to sb
                 if (isAtEnd()) { //backlash is the last char in the file
                     break
                 }
-                val e = advance()
-                if (seenDigit) {
-                    reportError(line, "Escape '\\$e' not allowed after digits; digits may only be trailing.")
-                    valid = false
-                }else{
-                    when (e){ //checks the char after backslash
+                when (val e = advance()){ //checks the char after backslash
                     'n' -> sb.append('\n')
                     't' -> sb.append('\t')
-                    '"' -> sb.append('"')   
+                    '"' -> sb.append('"')
                     '\\' -> sb.append('\\')
-                    else -> { 
+                    else -> {
                         reportError(line, "Unkown escape '\\$e'.") //report unknown escape
                         valid=false
-                    } //the unknown char will recorded, to not lose the data
-                }
+                    } //unknown escape: nothing appended, string will be rejected
                 }
                 
-            } else{ //for ordinary char
-                    val ch = advance()
-                    if (ch == '\r'){
-                        if (peek() == '\n') advance()
-                        sb.append('\n')
-                    }else{
-                        sb.append(ch)
-                    }
-                }
+            }
+            else{ //for ordinary char
+                    sb.append(advance())
+            }
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
@@ -163,14 +144,13 @@ class Scanner(private var source: String = "") {
         //replace the message for fa-il(), to not directly call exitProcess, just print the the error and keep running
         System.err.println("[line $line] Error: $message")
     }
-//fail("[line $line] Error: $message")
 
 
-    fun printCode(){ //just prints the code in the file line by line
+    fun printCode(){ //prints the entire source as UTF-8
         System.out.write(source.toByteArray(StandardCharsets.UTF_8))
     }
 
-    //write token scanner here
+    //turn source text into a list of tokens
     fun tokenize(){
         while (!isAtEnd()){
             start = current
@@ -178,9 +158,9 @@ class Scanner(private var source: String = "") {
         }
         tokens.add(Token("EOF", "", startLine = line, endLine = line))
     }
-    private fun scanToken(){ //hindi ko gin enum class
+    private fun scanToken(){ //decides what type of token
         when (val c = advance()){
-           '(' -> addToken("LEFT_PAREN")
+            '(' -> addToken("LEFT_PAREN")
             ')' -> addToken("RIGHT_PAREN")
             '{' -> addToken("LEFT_BRACE")
             '}' -> addToken("RIGHT_BRACE")
@@ -205,11 +185,13 @@ class Scanner(private var source: String = "") {
                     }
                     if (isAtEnd()){ //not finished /* */
                         reportError(line, "Unterminated block comment.")
-                    } else {
-                        advance() //consumes *
-                        advance() //consumes /
                     }
-                }else {
+                    else {
+                        advance() //consumes *
+                        advance() //skip a character inside the comment
+                    }
+                }
+                else {
                     addToken("SLASH") // for non comments
                 }
             }
@@ -220,7 +202,7 @@ class Scanner(private var source: String = "") {
                 if (c.isLetter()) identifier()
                 else if (c.isDigit()) number()
                 else reportError(line, "Unexpected character '$c'.")
-        }
+            }
         }
     }
     //for REPL
@@ -238,5 +220,4 @@ class Scanner(private var source: String = "") {
             System.out.write(token.toString().toByteArray(StandardCharsets.UTF_8))
         }
     }
-
 }
