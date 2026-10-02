@@ -19,19 +19,19 @@ class Scanner(private var source: String = "") {
 
     var hadError = false
     private val keywords = mapOf( //keywords of our language
-        "manifest" to "MANIFEST",
-        "whilst" to "WHILST",
-        "etch" to "ETCH",
-        "scry" to "SCRY",
-        "else" to "ELSE",
-        "true" to "TRUE",
-        "false" to "FALSE",
-        "and" to "AND",
-        "or" to "OR",
-        "circle" to "CIRCLE",
-        "sigil" to "SIGIL",
-        "imbue" to "IMBUE",
-        "null" to "NIL"
+        "manifest" to TokenType.MANIFEST,
+        "whilst" to TokenType.WHILST,
+        "etch" to TokenType.ETCH,
+        "scry" to TokenType.SCRY,
+        "else" to TokenType.ELSE,
+        "true" to TokenType.TRUE,
+        "false" to TokenType.FALSE,
+        "and" to TokenType.AND,
+        "or" to TokenType.OR,
+        "circle" to TokenType.CIRCLE,
+        "sigil" to TokenType.SIGIL,
+        "imbue" to TokenType.IMBUE,
+        "null" to TokenType.NIL
     )
 
 
@@ -54,7 +54,7 @@ class Scanner(private var source: String = "") {
         current++
         return true //consumes a match
     }
-    private fun addToken(type: String, literal: Any? = null, startLine: Int = line, endLine: Int = line) { //replaced tokenLine: Int = line
+    private fun addToken(type: TokenType, literal: Any? = null, startLine: Int = line, endLine: Int = line) { //replaced tokenLine: Int = line
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal, startLine, endLine))// replace tokenLine with startLine and endLine
     }
@@ -62,10 +62,10 @@ class Scanner(private var source: String = "") {
     private fun identifier() {
         while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
-        val type = keywords[text] ?: "IDENTIFIER" //keyword or identifier
+        val type = keywords[text] ?: TokenType.IDENTIFIER //keyword or identifier
         val literal: Any? = when (type) { //for the handling of boolean, true or false
-            "TRUE" -> true
-            "FALSE" -> false
+            TokenType.TRUE -> true
+            TokenType.FALSE -> false
             else -> null
         }
         addToken(type, literal)
@@ -94,7 +94,7 @@ class Scanner(private var source: String = "") {
             reportError(line,"Invalid number literal '$value'.")
             return
         } 
-        addToken("NUMBER", d)
+        addToken(TokenType.NUMBER, d)
     }
     private fun peekNext(): Char = if (current + 1 >= source.length) '\u0000' else source[current + 1]
     
@@ -115,7 +115,7 @@ class Scanner(private var source: String = "") {
                     '"' -> sb.append('"')
                     '\\' -> sb.append('\\')
                     else -> {
-                        reportError(line, "Unkown escape '\\$e'.") //report unknown escape
+                        reportError(line, "Unknown escape '\\$e'.") //report unknown escape
                         valid=false
                     } //unknown escape: nothing appended, string will be rejected
                 }
@@ -127,13 +127,13 @@ class Scanner(private var source: String = "") {
         }
         if(isAtEnd()){ //loop exit because no input left
             reportError(startLine, "Unterminated string.")
-            addToken("STRING", source.substring(start+1, current))
+            addToken(TokenType.STRING, source.substring(start+1, current))
             return
         } 
         advance()
         val endLine = line
         if (valid) {
-            addToken("STRING",  sb.toString(), startLine, endLine)
+            addToken(TokenType.STRING,  sb.toString(), startLine, endLine)
         }
     }
 
@@ -141,7 +141,7 @@ class Scanner(private var source: String = "") {
 
     private fun reportError(line: Int, message: String) {
         hadError = true
-        //replace the message for fa-il(), to not directly call exitProcess, just print the the error and keep running
+        //replace the message for fa-il(), to not directly call exitProcess, just print the error and keep running
         System.err.println("[line $line] Error: $message")
     }
 
@@ -156,25 +156,25 @@ class Scanner(private var source: String = "") {
             start = current
             scanToken()
         }
-        tokens.add(Token("EOF", "", startLine = line, endLine = line))
+        tokens.add(Token(TokenType.EOF, "", startLine = line, endLine = line))
     }
     private fun scanToken(){ //decides what type of token
         when (val c = advance()){
-            '(' -> addToken("LEFT_PAREN")
-            ')' -> addToken("RIGHT_PAREN")
-            '{' -> addToken("LEFT_BRACE")
-            '}' -> addToken("RIGHT_BRACE")
-            ':' -> addToken("COLON")
-            ';' -> addToken("SEMICOLON")
-            ',' -> addToken("COMMA")
-            '.' -> addToken("DOT")
-            '*' -> addToken("STAR")
-            '=' -> addToken(if (match('=')) "EQUAL_EQUAL" else "EQUAL")
-            '+' -> addToken("PLUS")
-            '-' -> addToken("MINUS")
-            '<' -> addToken(if (match('=')) "LESS_EQUAL" else "LESS")
-            '>' -> addToken(if(match('=')) "GREATER_EQUAL" else "GREATER")
-            '!' -> addToken(if(match('=')) "NOT_EQUAL" else "BANG")
+            '(' -> addToken(TokenType.LEFT_PAREN)
+            ')' -> addToken(TokenType.RIGHT_PAREN)
+            '{' -> addToken(TokenType.LEFT_BRACE)
+            '}' -> addToken(TokenType.RIGHT_BRACE)
+            ':' -> addToken(TokenType.COLON)
+            ';' -> addToken(TokenType.SEMICOLON)
+            ',' -> addToken(TokenType.COMMA)
+            '.' -> addToken(TokenType.DOT)
+            '*' -> addToken(TokenType.STAR)
+            '=' -> addToken(if (match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
+            '+' -> addToken(TokenType.PLUS)
+            '-' -> addToken(TokenType.MINUS)
+            '<' -> addToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
+            '>' -> addToken(if(match('=')) TokenType.GREATER_EQUAL else TokenType.GREATER)
+            '!' -> addToken(if(match('=')) TokenType.NOT_EQUAL else TokenType.BANG)
             '/' -> {
                 if (match('/')){
                     while (peek() != '\n' && !isAtEnd())
@@ -192,11 +192,11 @@ class Scanner(private var source: String = "") {
                     }
                 }
                 else {
-                    addToken("SLASH") // for non comments
+                    addToken(TokenType.SLASH) // for non comments
                 }
             }
             ' ', '\r', '\t' -> {}         //ignore whitespace
-            '\n' -> addToken("NEWLINE", startLine = line -1, endLine = line -1)
+            '\n' -> addToken(TokenType.NEWLINE, startLine = line -1, endLine = line -1)
             '"' -> string()
             else -> {
                 if (c.isLetter()) identifier()

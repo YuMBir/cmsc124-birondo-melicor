@@ -32,7 +32,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     fun parse(){
         while (!isAtEnd()) {
             expressions.add(highest())
-            match("NEWLINE") // consume newline
+            match(TokenType.NEWLINE) // consume newline
         }
     }
 
@@ -47,7 +47,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
      * Checks token type and consumes if true, else returns false
      * Multiple token types can be used in the condition.
      */
-    fun match(vararg type: String): Boolean{
+    fun match(vararg type: TokenType): Boolean{
         if (peek().getType() in type){
             consume(*type)
             return true
@@ -61,7 +61,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
      * Advances to next token.
      * Returns error if token type is incorrect.
      */
-    fun consume(vararg type: String): Token{
+    fun consume(vararg type: TokenType): Token{
         if (peek().getType() in type){
             return tokens[current++]
         }
@@ -77,7 +77,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return tokens[current - 1]
     }
 
-    fun isAtEnd() = peek().getType() == "EOF"
+    fun isAtEnd() = peek().getType() == TokenType.EOF
 
     fun highest(): Expr{
         return arguments()
@@ -86,7 +86,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
         args.add(firstArg())
-        while (match("COMMA")){
+        while (match(TokenType.COMMA)){
             args.add(firstArg())
         }
         return Arguments(args)
@@ -96,28 +96,28 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
     fun logicOr(): Expr{
         var node = logicAnd()
-        while (match("OR")){
+        while (match(TokenType.OR)){
             node = Binary(node, previous(), logicAnd())
         }
         return node
     }
     fun logicAnd(): Expr{
         var node = equality()
-        while (match("AND")){
+        while (match(TokenType.AND)){
             node = Binary(node, previous(), equality())
         }
         return node
     }
     fun equality(): Expr{
         var node = relational()
-        while (match ("EQUAL_EQUAL", "NOT_EQUAL")){
+        while (match (TokenType.EQUAL_EQUAL, TokenType.NOT_EQUAL)){
             node = Binary(node, previous(), relational())
         }
         return node
     }
     fun relational(): Expr{
         var node = expression()
-        while (match("GREATER", "GREATER_EQUAL", "LESS", "LESS_EQUAL")){
+        while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)){
             node = Binary(node, previous(), expression())
         }
         return node
@@ -128,20 +128,20 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
     fun addTerm(): Expr{
         var node = mulTerm()
-        while (match("PLUS", "MINUS")){
+        while (match(TokenType.PLUS, TokenType.MINUS)){
             node = Binary(node, previous(), mulTerm())
         }
         return node
     }
     fun mulTerm(): Expr{
         var node = unaryTerm()
-        while (match("STAR", "SLASH")){
+        while (match(TokenType.STAR, TokenType.SLASH)){
             node = Binary(node, previous(), unaryTerm())
         }
         return node
     }
     fun unaryTerm(): Expr{
-        if (match("MINUS", "BANG")){
+        if (match(TokenType.MINUS, TokenType.BANG)){
             var operator = previous()
             var operand = unaryTerm()
             return UnaryOp(operator, operand)
@@ -149,12 +149,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return primary()
     }
     fun primary(): Expr{
-        if (match("NUMBER", "TRUE", "FALSE", "NIL")){
+        if (match(TokenType.NUMBER, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)){
             return Literal(previous())
         }
-        if (match("LEFT_PAREN")){
+        if (match(TokenType.LEFT_PAREN)){
             val node = expression()
-            consume("RIGHT_PAREN")
+            consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
         reportError("unexpected token at primary(): ${peek().getType()}")
