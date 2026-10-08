@@ -149,15 +149,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return primary()
     }
     fun primary(): Expr{
-        if (match(TokenType.NUMBER, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)){
+        if (match(TokenType.NUMBER, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)){
+            //ADDED TokenType.STRING
             return Literal(previous())
         }
+        if (match(TokenType.IDENTIFIER)){ //ADDED THIS 
+            return Identifier(previous())
+            }
         if (match(TokenType.LEFT_PAREN)){
-            val node = expression()
+            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or or.
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
         reportError("unexpected token at primary(): ${peek().getType()}")
     }
 }
-
