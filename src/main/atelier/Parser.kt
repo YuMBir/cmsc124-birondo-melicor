@@ -31,8 +31,17 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun parse(){
         while (!isAtEnd()) {
+            //skip blank lines and empty statements
+            while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
+            if (isAtEnd()) break
             expressions.add(highest())
-            match(TokenType.NEWLINE) // consume newline
+            //require a terminator after each expression
+            if (!match(TokenType.NEWLINE, TokenType.SEMICOLON)){
+                //only an error if not at EOF, as valid versiosn are x=5\ny=6 or x=5;y=6
+                if(!isAtEnd()){
+                    reportError("Expected newline or ';' after expression")
+                }
+            }
         }
     }
 
@@ -157,6 +166,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return Identifier(previous())
             }
         if (match(TokenType.LEFT_PAREN)){
+            //val node = expression()
             val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or or.
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
