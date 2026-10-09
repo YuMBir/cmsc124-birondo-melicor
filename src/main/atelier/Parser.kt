@@ -12,12 +12,13 @@ class Parser(private var tokens: List<Token> = listOf()) {
     var expressions = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
+        if (expressions.isEmpty()){
+            System.err.println("Error: nothing parsed")
+            exitProcess(65)
+        }
         for (expression in expressions){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
             System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
-        }
-        if (expressions.isEmpty()){
-            System.out.write("Nothing parsed\n".toByteArray(StandardCharsets.UTF_8))
         }
         System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
     }
@@ -31,8 +32,19 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun parse(){
         while (!isAtEnd()) {
+            //skip blank lines and empty statements
+            while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
+            if (isAtEnd()) break
             expressions.add(highest())
-            match(TokenType.NEWLINE) // consume newline
+            if (isAtEnd()) break
+            if(match(TokenType.SEMICOLON)){
+                //one trailing ';' is fine but consecutive ;; are not allowed
+                if (peek().getType() == TokenType.SEMICOLON) {
+                    reportError("Unexpected ';' after ';'")
+                }
+            }else if (!match(TokenType.NEWLINE)){   //require a terminator after each expression
+                reportError("Expected newline or ';' after expression")
+            }
         }
     }
 
@@ -66,7 +78,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return tokens[current++]
         }
         else{
-            reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
+          reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -149,15 +161,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return primary()
     }
     fun primary(): Expr{
-        if (match(TokenType.NUMBER, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)){
+        //ADDED TokenType.STRING
+        if (match(TokenType.NUMBER, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)){
             return Literal(previous())
         }
+        if (match(TokenType.IDENTIFIER)){ //ADDED THIS 
+            return Identifier(previous())
+            }
         if (match(TokenType.LEFT_PAREN)){
-            val node = expression()
+            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or or.
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
         reportError("unexpected token at primary(): ${peek().getType()}")
     }
 }
-

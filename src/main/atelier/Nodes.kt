@@ -43,7 +43,12 @@ class Sigil(val name: String, val type: SigilType): Expr{
         return "(sigil: $type $name)"
     }
 }
-
+//ADDED THE NEW CODE HERE
+class Identifier(val token: Token) : Expr {
+    override fun toString(): String {
+        return token.getLexeme()
+    }
+}
 enum class SigilType{
     ELEMENT,
     DIRECTION

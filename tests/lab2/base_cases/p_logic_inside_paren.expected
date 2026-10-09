@@ -1,0 +1,4 @@
+(args (group (+ 1.0 2.0)))
+(args (group (< 1.0 2.0)))
+(args (or (group (and true false)) true))
+(args (! (group (or a b))))
