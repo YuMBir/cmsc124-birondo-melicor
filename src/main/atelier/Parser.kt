@@ -173,7 +173,6 @@ class Parser(private var tokens: List<Token> = listOf()) {
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
-        //reportError(peek(), "Expect expression.")
         reportError("unexpected token at primary(): ${peek().getType()}")
     }
 }
