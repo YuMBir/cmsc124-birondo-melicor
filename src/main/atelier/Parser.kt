@@ -35,12 +35,14 @@ class Parser(private var tokens: List<Token> = listOf()) {
             while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
             if (isAtEnd()) break
             expressions.add(highest())
-            //require a terminator after each expression
-            if (!match(TokenType.NEWLINE, TokenType.SEMICOLON) && !isAtEnd()){
-                //only an error if not at EOF, as valid versiosn are x=5\ny=6 or x=5;y=6
-                if(!isAtEnd()){
-                    reportError("Expected newline or ';' after expression")
+            if (isAtEnd()) break
+            if(match(TokenType.SEMICOLON)){
+                //one trailing ';' is fine but consecutive ;; are not allowed
+                if (peek().getType() == TokenType.SEMICOLON) {
+                    reportError("Unexpected ';' after ';'")
                 }
+            }else if (!match(TokenType.NEWLINE)){   //require a terminator after each expression
+                reportError("Expected newline or ';' after expression")
             }
         }
     }
