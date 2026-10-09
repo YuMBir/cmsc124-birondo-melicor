@@ -36,7 +36,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             if (isAtEnd()) break
             expressions.add(highest())
             //require a terminator after each expression
-            if (!match(TokenType.NEWLINE, TokenType.SEMICOLON)){
+            if (!match(TokenType.NEWLINE, TokenType.SEMICOLON) && !isAtEnd()){
                 //only an error if not at EOF, as valid versiosn are x=5\ny=6 or x=5;y=6
                 if(!isAtEnd()){
                     reportError("Expected newline or ';' after expression")
