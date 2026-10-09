@@ -12,12 +12,13 @@ class Parser(private var tokens: List<Token> = listOf()) {
     var expressions = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
+        if (expressions.isEmpty()){
+            System.err.println("Error: nothing parsed")
+            exitProcess(65)
+        }
         for (expression in expressions){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
             System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
-        }
-        if (expressions.isEmpty()){
-            System.out.write("Nothing parsed\n".toByteArray(StandardCharsets.UTF_8))
         }
         System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
     }
@@ -77,7 +78,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return tokens[current++]
         }
         else{
-            reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
+          reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -172,6 +173,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
+        //reportError(peek(), "Expect expression.")
         reportError("unexpected token at primary(): ${peek().getType()}")
     }
 }
