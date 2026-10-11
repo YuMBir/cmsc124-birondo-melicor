@@ -25,6 +25,33 @@ class Evaluator {
             else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
         }
     }
+    private fun evalBinary(node: Binary): Any? {
+        //from left to right
+        val left = evaluate(node.left)
+        val right = evaluate(node.right)
+        val op = node.operator
+        return when (op.getType()){
+            TokenType.PLUS -> {
+                checkNumberOperands(op, left, right)
+                (left as Double) + (right as Double)
+            }
+            TokenType.MINUS -> {
+                checkNumberOperands(op, left, right)
+                (left as Double) - (right as Double)
+            }
+            TokenType.STAR -> {
+                checkNumberOperands(op, left, right)
+                (left as Double) * (right as Double)
+            }
+            TokenType.SLASH -> {
+                checkNumberOperands(op, left, right)
+                if (right == 0.0) throw RuntimeError(op, "Division by zero.") //division by zero
+                (left as Double) / (right as Double)
+            }
+            // comparison, equality, and/or, string + are not implemented as of yet
+            else -> throw RuntimeError(op, "Unsupported operator.")
+        }
+    }    
 
 
 
