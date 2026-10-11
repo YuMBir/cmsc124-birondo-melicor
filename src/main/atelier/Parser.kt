@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
 class Parser(private var tokens: List<Token> = listOf()) {
-    private fun reportError(message: String): Nothing {
-        System.err.println("Parser: $message")
+    private fun reportError(lineText: String, message: String): Nothing {
+        System.err.println("[line $lineText]Parser: $message")
         exitProcess(65)
     }
     var trees = mutableListOf<Expr>()
@@ -39,10 +39,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
             if(match(TokenType.SEMICOLON)){
                 //one trailing ';' is fine but consecutive ;; are not allowed
                 if (peek().getType() == TokenType.SEMICOLON) {
-                    reportError("Unexpected ';' after ';'")
+                    reportError(peek().getLine(),"Unexpected ';' after ';'")
                 }
             }else if (!match(TokenType.NEWLINE)){   //require a terminator after each expression
-                reportError("Expected newline or ';' after expression")
+                reportError(peek().getLine(),"Expected newline or ';' after expression")
             }
         }
     }
@@ -77,7 +77,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return tokens[current++]
         }
         else{
-          reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
+            reportError(peek().getLine(),"unexpected token: ${previous().getType()} expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -168,10 +168,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return Identifier(previous())
             }
         if (match(TokenType.LEFT_PAREN)){
-            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or or.
+            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or.
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
-        reportError("unexpected token at primary(): ${peek().getType()}")
+        reportError(peek().getLine(),"unexpected token at primary(): ${peek().getType()}")
     }
 }
