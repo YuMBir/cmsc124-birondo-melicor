@@ -46,6 +46,7 @@ data class Token(private val type: TokenType, private val lexeme: String, privat
     fun getLine(): String{
         return "$startLine:$endLine"
     }
+    fun getStartLine(): Int = startLine
 }
 
 enum class TokenType {
