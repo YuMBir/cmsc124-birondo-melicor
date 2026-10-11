@@ -65,6 +65,19 @@ class Evaluator {
         for (e in node.expressions) result = evaluate(e)
         return result
     }
+    fun stringify(value: Any?): String = when (value) {
+        null -> "nil"
+        // doubles print as 5.0; trim the ".0" so 2 + 3 prints "5"
+        is Double -> { //turns number (double) into a string, drop the .0 if the number is 5.0, but if 5.5 then don't remove ".0"
+            val s = value.toString()
+            if (s.endsWith(".0")) s.dropLast(2) else s
+        }
+
+
+        // strings print without quotes; booleans print true/false
+        else -> value.toString()
+    }
+
 
 
     
