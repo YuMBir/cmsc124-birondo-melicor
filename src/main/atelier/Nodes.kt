@@ -3,7 +3,7 @@ package atelier
 sealed interface Expr{
     override fun toString(): String
 }
-class Arguments(private val expressions: List<Expr>) : Expr{
+class Arguments(val expressions: List<Expr>) : Expr{ //deleted the private declaration for expressions for lab3
     override fun toString(): String{
         return expressions.joinToString(separator = ", ", prefix = "(args ", postfix = ")")
     }
