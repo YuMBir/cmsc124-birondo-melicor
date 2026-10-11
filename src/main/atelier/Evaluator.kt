@@ -60,7 +60,7 @@ class Evaluator {
         if (l is Double && r is Double) return
         throw RuntimeError(op, "Operands must be numbers.")
     }
-    private fun evalArguments(node: Arguments): Any? {
+    private fun evalArguments(node: Arguments): Any? { //evaluates expressions such as (args (+ 2.0 (* 3.0 4.0)))
         var result: Any? = null
         for (e in node.expressions) result = evaluate(e)
         return result
