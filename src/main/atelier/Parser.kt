@@ -3,20 +3,19 @@ package atelier
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
-private fun reportError(message: String): Nothing {
-    System.err.println("Parser: $message")
-    exitProcess(65)
-}
-
 class Parser(private var tokens: List<Token> = listOf()) {
-    var expressions = mutableListOf<Expr>()
+    private fun reportError(message: String): Nothing {
+        System.err.println("Parser: $message")
+        exitProcess(65)
+    }
+    var trees = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
-        if (expressions.isEmpty()){
+        if (trees.isEmpty()){
             System.err.println("Error: nothing parsed")
             exitProcess(65)
         }
-        for (expression in expressions){
+        for (expression in trees){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
             System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
         }
@@ -25,7 +24,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun setParser(newTokens: List<Token>){
         current = 0
-        expressions.clear()
+        trees.clear()
         tokens = newTokens
 
     }
@@ -35,7 +34,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             //skip blank lines and empty statements
             while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
             if (isAtEnd()) break
-            expressions.add(highest())
+            trees.add(highest())
             if (isAtEnd()) break
             if(match(TokenType.SEMICOLON)){
                 //one trailing ';' is fine but consecutive ;; are not allowed
