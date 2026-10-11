@@ -1,5 +1,7 @@
 {
   "ext": ".spell",
   "flag": "--eval",
-  "mode": "sidecar"
+  "mode": "inline",
+  "comment_prefix": "//"
+
 }
