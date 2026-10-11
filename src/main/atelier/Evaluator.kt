@@ -56,6 +56,11 @@ class Evaluator {
         if (v is Double) return
         throw RuntimeError(op, "Operand must be a number.")
     }
+    private fun checkNumberOperands(op: Token, l: Any?, r: Any?) {//for the binary
+        if (l is Double && r is Double) return
+        throw RuntimeError(op, "Operands must be numbers.")
+    }
+
     
 
 
