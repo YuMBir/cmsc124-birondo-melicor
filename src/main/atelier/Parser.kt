@@ -6,8 +6,9 @@ import kotlin.system.exitProcess
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
         System.err.println("Parser: [line $lineText] $message")
-        exitProcess(65)
+        error("ParserError")
     }
+    var exitStatus = 0
     var trees = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
@@ -31,20 +32,36 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun parse(){
         while (!isAtEnd()) {
-            //skip blank lines and empty statements
-            while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
-            if (isAtEnd()) break
-            trees.add(highest())
-            if (isAtEnd()) break
-            if(match(TokenType.SEMICOLON)){
-                //one trailing ';' is fine but consecutive ;; are not allowed
-                if (peek().getType() == TokenType.SEMICOLON) {
-                    reportError(peek().getLine(),"Unexpected ';' after ';'")
+            try{
+                //skip blank lines and empty statements
+                while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
+                if (isAtEnd()) break
+                trees.add(highest())
+                if (isAtEnd()) break
+                if(match(TokenType.SEMICOLON, TokenType.NEWLINE)){
+                    //one trailing ';' is fine but consecutive ;; are not allowed
+                    if (peek().getType() == TokenType.SEMICOLON) {
+                        reportError(peek().getLine(),"Unexpected ';' after ';'. Expected expression after ';'")
+                    }
+                }else{
+                    reportError(peek().getLine(), "Unexpected ${peek().getType()}. NEWLINE, SEMICOLON, or EOF Expected after Expression")
                 }
-            }else if (!match(TokenType.NEWLINE)){   //require a terminator after each expression
-                reportError(peek().getLine(),"Expected newline or ';' after expression")
+            }catch(e:Exception){
+                synchronize()
             }
         }
+
+
+    }
+    fun synchronize(){
+        exitStatus = 65
+        while (peek().getType() !in listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.EOF)) {
+            discard()
+        }
+        if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
+            parse()
+        }
+        return parse()
     }
 
     /**
@@ -52,6 +69,15 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun peek(increment: Int = 0): Token{
         return tokens[current + increment]
+    }
+
+    /**
+     * consume and return
+     */
+    fun advance(): Token{
+        val token = tokens[current]
+        if (!isAtEnd()) current++
+        return token
     }
 
     /**
@@ -74,10 +100,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun consume(vararg type: TokenType): Token{
         if (peek().getType() in type){
-            return tokens[current++]
+            return advance()
         }
         else{
-            reportError(peek().getLine(),"unexpected token: ${previous().getType()} expected token of type(s) ${type.contentToString()}")
+            reportError(peek().getLine(),"Unexpected token: ${previous().getType()}. Expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -86,6 +112,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun previous(): Token{
         return tokens[current - 1]
+    }
+    /**
+    * Advances without returning a token
+    */
+    fun discard(){
+        current++
     }
 
     fun isAtEnd() = peek().getType() == TokenType.EOF

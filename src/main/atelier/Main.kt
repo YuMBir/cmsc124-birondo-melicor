@@ -44,6 +44,7 @@ fun run(source: String, mode: String = "--print") {
             val atelierParser = Parser(tokens)
             atelierParser.parse()
             atelierParser.printAST()
+            exitProcess(atelierParser.exitStatus)
         }
         else -> fail("invalid flag")
     }
