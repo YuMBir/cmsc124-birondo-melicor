@@ -14,4 +14,18 @@ class Evaluator {
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
+    private fun evalUnary(node: UnaryOp): Any? {
+        val right = evaluate(node.node)
+        return when (node.operator.getType()) {
+            TokenType.MINUS -> {
+                checkNumberOperand(node.operator, right) // throws if not a number
+                -(right as Double) // it is a number then turn it into a Double then negate it
+            }
+            //the ! is not yet implemented
+            else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
+        }
+    }
+
+
+
 }
