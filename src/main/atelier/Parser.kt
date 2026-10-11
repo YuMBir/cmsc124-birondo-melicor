@@ -5,7 +5,7 @@ import kotlin.system.exitProcess
 
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
-        System.err.println("[line $lineText]Parser: $message")
+        System.err.println("Parser: [line $lineText] $message")
         exitProcess(65)
     }
     var trees = mutableListOf<Expr>()
