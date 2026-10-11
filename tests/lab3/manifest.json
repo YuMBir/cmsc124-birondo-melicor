@@ -2,6 +2,6 @@
   "ext": ".spell",
   "flag": "--eval",
   "mode": "inline",
-  "comment_prefix": "//"
-
+  "comment_prefix": ["//","/*"],
+  "comment_suffix": "*/"
 }
