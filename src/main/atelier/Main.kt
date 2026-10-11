@@ -46,6 +46,23 @@ fun run(source: String, mode: String = "--print") {
             atelierParser.printAST()
             exitProcess(atelierParser.exitStatus)
         }
+        "--eval" -> {
+            if (atelierScanner.hadError) exitProcess(65) // Static errors first, it will reject before running anything (exit 65).
+            val atelierParser = Parser(tokens)
+            atelierParser.parse()
+            // parser sets exitStatus to 65 on a syntax error, so reject before evaluating
+            if (atelierParser.exitStatus != 0) exitProcess(atelierParser.exitStatus)  // 65
+            val evaluator = Evaluator()
+            try {
+                for (tree in atelierParser.trees) { // one tree per expression in the file, print each value on its own line (stdout)
+                    val value = evaluator.evaluate(tree)
+                    System.out.write((evaluator.stringify(value) + "\n").toByteArray(StandardCharsets.UTF_8))
+                }
+            } catch (e: RuntimeError) {
+                    System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
+                    exitProcess(70)
+                }
+        }
         else -> fail("invalid flag")
     }
     if (atelierScanner.hadError) exitProcess(65) //placed this after when expression, to print the token statements instead of just returning error statements
