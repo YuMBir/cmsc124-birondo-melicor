@@ -15,7 +15,12 @@ class Group(val node: Expr) : Expr{
 }
 class Literal(val token: Token) : Expr{
     override fun toString(): String {
-        return token.getLiteralString()
+        if (token.getType() == TokenType.STRING){
+            return "\"${token.getLiteralString()}\""
+        }
+        else{
+            return token.getLiteralString()
+        }
     }
 }
 class Binary(val left: Expr, val operator:Token, val right: Expr) : Expr{

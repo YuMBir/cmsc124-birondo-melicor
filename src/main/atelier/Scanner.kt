@@ -142,7 +142,7 @@ class Scanner(private var source: String = "") {
     private fun reportError(line: Int, message: String) {
         hadError = true
         //replace the message for fa-il(), to not directly call exitProcess, just print the error and keep running
-        System.err.println("[line $line] Error: $message")
+        System.err.println("Scanner: [line $line] Error: $message")
     }
 
 

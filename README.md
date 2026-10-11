@@ -130,7 +130,7 @@ changelog.]
 ## Grammar
 
 ```
-letter := "A" | "B" | "C" | "D" | "E" | "F" | "G"
+letter ::= "A" | "B" | "C" | "D" | "E" | "F" | "G"
        | "H" | "I" | "J" | "K" | "L" | "M" | "N"
        | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
        | "V" | "W" | "X" | "Y" | "Z" | "a" | "b"
@@ -139,29 +139,35 @@ letter := "A" | "B" | "C" | "D" | "E" | "F" | "G"
        | "q" | "r" | "s" | "t" | "u" | "v" | "w"
        | "x" | "y" | "z" ;
 
-digit := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 
-symbol := "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
+symbol ::= "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
        | "'" | '"' | "=" | "|" | "." | "," | ";" | "-" 
        | "+" | "*" | "?" | "\n" | "\t" | "\r" | "\f" | "\b" ;
 
-character := letter | digit | symbol | "_" | " " ;
-identifier := letter , { letter | digit | "_" | "-" } ;
+character ::= letter | digit | symbol | "_" | " " ;
+IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 
-expression := addTerm
-addTerm       ::= mulTerm { ( PLUS | MINUS ) mulTerm }
-mulTerm     ::= primary { ( STAR | SLASH ) primary }
-primary    ::= NUMBER | LEFT_PAREN expression RIGHT_PAREN 
+<arguments> ::= <logicOr> { (COMMA) <logicOr> }
+<logicOr> ::= <logicAnd> { ( OR ) <logicAnd> }
+<logicAnd> ::= <equality> { ( AND ) <equality> }
+<equality> ::= <relational> { ( EQUAL_EQUAL | NOT_EQUAL ) <relational> }
+<relational> ::= <expression> { ( GREATER | GREATER_EQUAL | LESS | LESS_EQUAL ) <expression> }
+<expression> ::= <addTerm>
+<addTerm> ::= <mulTerm> { ( PLUS | MINUS ) <mulTerm> }
+<mulTerm> ::= <unaryTerm> { ( STAR | SLASH ) <unaryTerm> }
+<unaryTerm> ::= { ( MINUS | BANG ) } <primary>
+<primary> ::= NUMBER | LEFT_PAREN <expression> RIGHT_PAREN | IDENTIFIER
 ```
 
 ## Parse output format
 
 ```
-[one line of real --parse output, e.g. (+ 1.0 (* 2.0 3.0))]
+(args (+ 1.0 (* 2.0 3.0)))
 ```
 
-- Groupings print as: [form]
-- Numbers print as: [form]
+- Groupings print as: `group( <expression> )`
+- Numbers print as: `1.0` *printed as doubles*
 
 ## Semantics
 
@@ -178,8 +184,20 @@ language.]
 
 ### Truthiness
 
-[The complete rule. Which values are false in a condition; everything else is
-true.]
+| Value        | Truthiness |
+|--------------|------------|
+| `""`         | True       |
+| `" "`        | True       |
+| `"hello"`    | True       |
+| `true`       | True       |
+| `false`      | False      |
+| `0`          | False      |
+| `1`          | True       |
+| `99`         | True       |
+| `NaN`        | False      |
+| `nil`/`null` | False      |
+| `undefined`  | False      |
+
 
 ### Operator semantics
 

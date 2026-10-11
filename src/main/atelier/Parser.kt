@@ -3,20 +3,20 @@ package atelier
 import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
-private fun reportError(message: String): Nothing {
-    System.err.println("Parser: $message")
-    exitProcess(65)
-}
-
 class Parser(private var tokens: List<Token> = listOf()) {
-    var expressions = mutableListOf<Expr>()
+    private fun reportError(lineText: String, message: String): Nothing {
+        System.err.println("Parser: [line $lineText] $message")
+        error("ParserError")
+    }
+    var exitStatus = 0
+    var trees = mutableListOf<Expr>()
     var current = 0
     fun printAST(){
-        if (expressions.isEmpty()){
+        if (trees.isEmpty()){
             System.err.println("Error: nothing parsed")
             exitProcess(65)
         }
-        for (expression in expressions){
+        for (expression in trees){
             System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
             System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
         }
@@ -25,27 +25,43 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun setParser(newTokens: List<Token>){
         current = 0
-        expressions.clear()
+        trees.clear()
         tokens = newTokens
 
     }
 
     fun parse(){
         while (!isAtEnd()) {
-            //skip blank lines and empty statements
-            while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
-            if (isAtEnd()) break
-            expressions.add(highest())
-            if (isAtEnd()) break
-            if(match(TokenType.SEMICOLON)){
-                //one trailing ';' is fine but consecutive ;; are not allowed
-                if (peek().getType() == TokenType.SEMICOLON) {
-                    reportError("Unexpected ';' after ';'")
+            try{
+                //skip blank lines and empty statements
+                while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
+                if (isAtEnd()) break
+                trees.add(highest())
+                if (isAtEnd()) break
+                if(match(TokenType.SEMICOLON, TokenType.NEWLINE)){
+                    //one trailing ';' is fine but consecutive ;; are not allowed
+                    if (peek().getType() == TokenType.SEMICOLON) {
+                        reportError(peek().getLine(),"Unexpected ';' after ';'. Expected expression after ';'")
+                    }
+                }else{
+                    reportError(peek().getLine(), "Unexpected ${peek().getType()}. NEWLINE, SEMICOLON, or EOF Expected after Expression")
                 }
-            }else if (!match(TokenType.NEWLINE)){   //require a terminator after each expression
-                reportError("Expected newline or ';' after expression")
+            }catch(e:Exception){
+                synchronize()
             }
         }
+
+
+    }
+    fun synchronize(){
+        exitStatus = 65
+        while (peek().getType() !in listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.EOF)) {
+            discard()
+        }
+        if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
+            parse()
+        }
+        return parse()
     }
 
     /**
@@ -53,6 +69,15 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun peek(increment: Int = 0): Token{
         return tokens[current + increment]
+    }
+
+    /**
+     * consume and return
+     */
+    fun advance(): Token{
+        val token = tokens[current]
+        if (!isAtEnd()) current++
+        return token
     }
 
     /**
@@ -75,10 +100,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun consume(vararg type: TokenType): Token{
         if (peek().getType() in type){
-            return tokens[current++]
+            return advance()
         }
         else{
-          reportError("unexpected token: ${previous()} expected token of type(s) ${type.contentToString()}")
+            reportError(peek().getLine(),"Unexpected token: ${previous().getType()}. Expected token of type(s) ${type.contentToString()}")
         }
     }
 
@@ -87,6 +112,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun previous(): Token{
         return tokens[current - 1]
+    }
+    /**
+    * Advances without returning a token
+    */
+    fun discard(){
+        current++
     }
 
     fun isAtEnd() = peek().getType() == TokenType.EOF
@@ -169,10 +200,10 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return Identifier(previous())
             }
         if (match(TokenType.LEFT_PAREN)){
-            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or or.
+            val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or.
             consume(TokenType.RIGHT_PAREN)
             return Group(node)
         }
-        reportError("unexpected token at primary(): ${peek().getType()}")
+        reportError(peek().getLine(),"unexpected token at primary(): ${peek().getType()}")
     }
 }
