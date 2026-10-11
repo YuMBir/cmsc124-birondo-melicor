@@ -51,7 +51,13 @@ class Evaluator {
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
         }
-    }    
+    }
+    private fun checkNumberOperand(op: Token, v: Any?){ // for the unary 
+        if (v is Double) return
+        throw RuntimeError(op, "Operand must be a number.")
+    }
+    
+
 
 
 
