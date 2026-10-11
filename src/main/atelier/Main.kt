@@ -84,6 +84,8 @@ fun repl(){
     var lineNo = 1
     val atelierScanner = Scanner()
     val atelierParser = Parser()
+    val evaluator = Evaluator() //not yet implemented
+
     do  {
         val line: String? = readlnOrNull()
         //exits repl if empty string
