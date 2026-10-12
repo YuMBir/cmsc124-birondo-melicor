@@ -6,7 +6,7 @@ class RuntimeError(val token: Token?, message: String) : RuntimeException(messag
 class Evaluator {
     fun evaluate (node: Expr): Any? = when(node){
 
-        is Literal -> node.token.getLiteralValue() //scanner computed value, here, just retun the value
+        is Literal -> node.token.getLiteralValue() //return the value stored in the token
         is Group -> evaluate(node.node)//evaluate the inside of the parentheses 
         is Arguments -> evalArguments(node)
         is UnaryOp -> evalUnary(node)
