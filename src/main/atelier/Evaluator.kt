@@ -54,6 +54,14 @@ class Evaluator {
                 val (l,r) = checkNumberOperands(op, left, right)
                 l >= r
             }
+            TokenType.LESS -> {
+                val (l,r) = checkNumberOperands(op, left, right)
+                l < r
+            }
+            TokenType.LESS_EQUAL -> {
+                val (l,r) = checkNumberOperands(op, left, right)
+                l <= r
+            }
             
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
