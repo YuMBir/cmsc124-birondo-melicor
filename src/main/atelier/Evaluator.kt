@@ -56,7 +56,7 @@ class Evaluator {
         if (v is Double) return v
         throw RuntimeError(op, "Operand must be a number.")
     }
-    private fun checkNumberOperands(op: Token, l: Any?, r: Any?) Pair<Double, Double> {//for the binary
+    private fun checkNumberOperands(op: Token, l: Any?, r: Any?): Pair<Double, Double> {//for the binary
         if (l is Double && r is Double) return Pair(l,r)
         throw RuntimeError(op, "Operands must be numbers.")
     }
