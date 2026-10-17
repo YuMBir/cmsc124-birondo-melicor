@@ -63,7 +63,7 @@ class Evaluator {
                 l <= r
             }
             TokenType.EQUAL_EQUAL -> isEqual(left, right)
-            TokenType.BANG -> !isEqual(left,right)
+            TokenType.NOT_EQUAL -> !isEqual(left,right)
             
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
