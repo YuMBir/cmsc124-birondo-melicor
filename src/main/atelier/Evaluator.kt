@@ -62,6 +62,8 @@ class Evaluator {
                 val (l,r) = checkNumberOperands(op, left, right)
                 l <= r
             }
+            TokenType.EQUAL_EQUAL -> isEqual(left, right)
+            TokenType.BANG_EQUAL -> !isEqual(left,right)
             
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
