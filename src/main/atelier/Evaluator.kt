@@ -82,6 +82,12 @@ class Evaluator {
         for (e in node.expressions) result = evaluate(e)
         return result
     }
+    private fun isEqual(a: Any?, b: Any?): Boolean {
+        if (a == null && b == null) return true //nil == nil
+        if (a == null || b == null) return false 
+        if (a is Double && b is Double) return a == b
+        return a == b
+    }
     fun stringify(value: Any?): String = when (value) {
         null -> "nil"
         // doubles print as 5.0; trim the ".0" so 2 + 3 prints "5"
