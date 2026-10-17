@@ -38,10 +38,12 @@ class Evaluator {
             TokenType.MINUS -> {
                 checkNumberOperands(op, left, right)
                 (left as Double) - (right as Double)
+                
             }
             TokenType.STAR -> {
                 checkNumberOperands(op, left, right)
                 (left as Double) * (right as Double)
+               
             }
             TokenType.SLASH -> {
                 checkNumberOperands(op, left, right)
@@ -52,12 +54,12 @@ class Evaluator {
             else -> throw RuntimeError(op, "Unsupported operator.")
         }
     }
-    private fun checkNumberOperand(op: Token, v: Any?){ // for the unary 
-        if (v is Double) return
+    private fun checkNumberOperand(op: Token, v: Any?): Double { // for the unary 
+        if (v is Double) return v
         throw RuntimeError(op, "Operand must be a number.")
     }
-    private fun checkNumberOperands(op: Token, l: Any?, r: Any?) {//for the binary
-        if (l is Double && r is Double) return
+    private fun checkNumberOperands(op: Token, l: Any?, r: Any?) Pair<Double, Double> {//for the binary
+        if (l is Double && r is Double) return Pair(l,r)
         throw RuntimeError(op, "Operands must be numbers.")
     }
     private fun evalArguments(node: Arguments): Any? { //evaluates expressions such as (args (+ 2.0 (* 3.0 4.0)))
