@@ -46,6 +46,15 @@ class Evaluator {
                 if (r == 0.0) throw RuntimeError (op, "Division by zero.")
                 l/r
             }
+            TokenType.GREATER -> {
+                val (l,r) = checkNumberOperands(op, left, right)
+                l > r
+            }
+            TokenType.GREATER_EQUAL -> {
+                val (l,r) = checkNumberOperands(op, left, right)
+                l >= r
+            }
+            
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
         }
