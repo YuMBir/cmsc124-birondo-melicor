@@ -32,18 +32,16 @@ class Evaluator {
         val op = node.operator
         return when (op.getType()){
             TokenType.PLUS -> {
-                checkNumberOperands(op, left, right)
-                (left as Double) + (right as Double)
+                val (l,r) = checkNumberOperands(op, left, right)
+                l + r
             }
             TokenType.MINUS -> {
-                checkNumberOperands(op, left, right)
-                (left as Double) - (right as Double)
-                
+                val (l,r) = checkNumberOperands(op, left, right)
+                l - r
             }
             TokenType.STAR -> {
-                checkNumberOperands(op, left, right)
-                (left as Double) * (right as Double)
-               
+               val (l,r) = checkNumberOperands(op, left, right)
+               l * r
             }
             TokenType.SLASH -> {
                 checkNumberOperands(op, left, right)
