@@ -17,10 +17,8 @@ class Evaluator {
     private fun evalUnary(node: UnaryOp): Any? {
         val right = evaluate(node.node)
         return when (node.operator.getType()) {
-            TokenType.MINUS -> {
-                checkNumberOperand(node.operator, right) // throws if not a number
-                -(right as Double) // it is a number then turn it into a Double then negate it
-            }
+            TokenType.MINUS -> -checkNumberOperand(node.operator, right) // throws if not a number
+
             //the ! is not yet implemented
             else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
         }
