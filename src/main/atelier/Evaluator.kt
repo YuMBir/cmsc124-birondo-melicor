@@ -29,9 +29,11 @@ class Evaluator {
         val right = evaluate(node.right)
         val op = node.operator
         return when (op.getType()){
-            TokenType.PLUS -> {
-                val (l,r) = checkNumberOperands(op, left, right)
-                l + r
+            TokenType.PLUS -> when {
+                left is Double && right is Double -> left + right
+                left is String && right is String -> left + right
+                else -> throw RuntimeError(op, "Operands must be two numbers or two strings.")
+                
             }
             TokenType.MINUS -> {
                 val (l,r) = checkNumberOperands(op, left, right)
