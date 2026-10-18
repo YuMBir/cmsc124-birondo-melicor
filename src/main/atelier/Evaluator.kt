@@ -11,6 +11,7 @@ class Evaluator {
         is Arguments -> evalArguments(node)
         is UnaryOp -> evalUnary(node)
         is Binary-> evalBinary(node)
+        is Identifier -> throw RuntimeError(node.token, "Variable is not supported yet.")
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
