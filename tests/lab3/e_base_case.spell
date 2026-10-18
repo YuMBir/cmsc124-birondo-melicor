@@ -1,0 +1,8 @@
+42 // expect: 42
+3.5 // expect: 3.5
+0 // expect: 0
+"hello" // expect: hello
+"" // expect:
+true // expect: true
+false // expect: false
+null // expect: nil
