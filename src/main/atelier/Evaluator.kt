@@ -18,7 +18,7 @@ class Evaluator {
         val right = evaluate(node.node)
         return when (node.operator.getType()) {
             TokenType.MINUS -> -checkNumberOperand(node.operator, right) // throws if not a number
-
+            TokenType.BANG -> !isTruthy(right)
             //the ! is not yet implemented
             else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
         }
@@ -65,6 +65,7 @@ class Evaluator {
             TokenType.EQUAL_EQUAL -> isEqual(left, right)
             TokenType.NOT_EQUAL -> !isEqual(left,right)
             
+            
             // comparison, equality, and/or, string + are not implemented as of yet
             else -> throw RuntimeError(op, "Unsupported operator.")
         }
@@ -87,6 +88,12 @@ class Evaluator {
         if (a == null || b == null) return false 
         if (a is Double && b is Double) return a == b
         return a == b
+    }
+    private fun isTruthy(v: Any?): Boolean = when(v){
+        null -> false
+        is Boolean -> v
+        is Double -> !(v == 0.0 || v.isNaN())
+        else -> true
     }
     fun stringify(value: Any?): String = when (value) {
         null -> "nil"
