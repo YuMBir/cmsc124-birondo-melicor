@@ -41,6 +41,7 @@ class Evaluator {
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
                 left is String && right is String -> left + right
+                left is String || right is String -> stringify(left) + stringify(right) 
                 else -> throw RuntimeError(op, "Operands must be two numbers or two strings.")
                 
             }
