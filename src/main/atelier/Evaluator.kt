@@ -33,7 +33,10 @@ class Evaluator {
             if (!isTruthy(evaluate(node.left))) return false
             return isTruthy(evaluate(node.right))
         }
-        
+        if (op.getType()==TokenType.OR){
+            if (isTruthy(evaluate(node.left))) return true
+            return isTruthy(evaluate(node.right))
+        }
         return when (op.getType()){
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
