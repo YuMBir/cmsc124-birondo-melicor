@@ -24,10 +24,16 @@ class Evaluator {
         }
     }
     private fun evalBinary(node: Binary): Any? {
+        
         //from left to right
         val left = evaluate(node.left)
         val right = evaluate(node.right)
         val op = node.operator
+        if (op.getType()==TokenType.AND){
+            if (!isTruthy(evaluate(node.left))) return false
+            return isTruthy(evaluate(node.right))
+        }
+        
         return when (op.getType()){
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
