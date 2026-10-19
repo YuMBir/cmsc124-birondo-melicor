@@ -15,7 +15,7 @@ class Evaluator {
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
-    private fun evalUnary(node: UnaryOp): Any? {
+    private fun evalUnary(node: UnaryOp): Any {
         val right = evaluate(node.node)
         return when (node.operator.getType()) {
             TokenType.MINUS -> -checkNumberOperand(node.operator, right) // throws if not a number
@@ -24,7 +24,7 @@ class Evaluator {
             else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
         }
     }
-    private fun evalBinary(node: Binary): Any? {
+    private fun evalBinary(node: Binary): Any {
         
         //from left to right
         val left = evaluate(node.left)
