@@ -44,24 +44,21 @@ fun run(source: String, mode: String = "--print") {
             val atelierParser = Parser(tokens)
             val ast = atelierParser.parse()
             System.out.write(ast.toString().toByteArray(StandardCharsets.UTF_8))
-            exitProcess(atelierParser.exitStatus)
+            exitProcess(atelierParser.getExitStatus())
         }
         "--eval" -> {
             if (atelierScanner.hadError) exitProcess(65) // Static errors first, it will reject before running anything (exit 65).
             val atelierParser = Parser(tokens)
             val ast = atelierParser.parse()
             // parser sets exitStatus to 65 on a syntax error, so reject before evaluating
-            if (atelierParser.exitStatus != 0) exitProcess(atelierParser.exitStatus)  // 65
-            val evaluator = Evaluator()
-            try {
-                for (tree in atelierParser.trees) { // one tree per expression in the file, print each value on its own line (stdout)
-                    val value = evaluator.evaluate(tree)
-                    System.out.write((evaluator.stringify(value) + "\n").toByteArray(StandardCharsets.UTF_8))
-                }
-            } catch (e: RuntimeError) {
-                    System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
-                    exitProcess(70)
-                }
+            if (atelierParser.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())  // 65
+            val atelierEval = Evaluator()
+            val values = atelierEval.evaluateProgram(ast)
+            for (value in values) {
+                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
+            }
+            if (atelierEval.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())
+
         }
         else -> fail("invalid flag")
     }

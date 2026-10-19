@@ -7,7 +7,7 @@ it also carries the token so Main.kt can report the line number.
 token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
-    private val exitStatus = 0
+    private var exitStatus = 0
     fun getExitStatus(): Int {
         return exitStatus
     }
@@ -29,7 +29,7 @@ class Evaluator {
                 values.add(evaluate(node))
             } catch (e: RuntimeError) {
                 System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
-                exitProcess(70)
+                exitStatus = 70
             }
 
         }
@@ -55,7 +55,7 @@ class Evaluator {
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
                 left is String && right is String -> left + right
-                left is String || right is String -> stringify(left) + stringify(right) 
+                left is String || right is String -> left.toString() + right.toString()
                 else -> throw RuntimeError(op, "Operands must be two numbers or two strings.")
                 
             }
@@ -128,18 +128,6 @@ class Evaluator {
         is Boolean -> v
         is Double -> !(v == 0.0 || v.isNaN())
         else -> true
-    }
-    fun stringify(value: Any?): String = when (value) {
-        null -> "nil"
-        // doubles print as 5.0; trim the ".0" so 2 + 3 prints "5"
-        is Double -> { //turns number (double) into a string, drop the .0 if the number is 5.0, but if 5.5 then don't remove ".0"
-            val s = value.toString()
-            if (s.endsWith(".0")) s.dropLast(2) else s
-        }
-
-
-        // strings print without quotes; booleans print true/false
-        else -> value.toString()
     }
 
 
