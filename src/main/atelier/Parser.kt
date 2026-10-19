@@ -11,17 +11,6 @@ class Parser(private var tokens: List<Token> = listOf()) {
     var exitStatus = 0
     var trees = mutableListOf<Expr>()
     var current = 0
-    fun printAST(){
-        if (trees.isEmpty()){
-            System.err.println("Error: nothing parsed")
-            exitProcess(65)
-        }
-        for (expression in trees){
-            System.out.write(expression.toString().toByteArray(StandardCharsets.UTF_8))
-            System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
-        }
-        System.out.write("\n".toByteArray(StandardCharsets.UTF_8))
-    }
 
     fun setParser(newTokens: List<Token>){
         current = 0
@@ -30,7 +19,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     }
 
-    fun parse(){
+    fun parse(): Expr{
         while (!isAtEnd()) {
             try{
                 //skip blank lines and empty statements
@@ -50,8 +39,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
                 synchronize()
             }
         }
-
-
+        return Program(trees)
     }
     fun synchronize(){
         exitStatus = 65
@@ -61,7 +49,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
             parse()
         }
-        return parse()
+        parse()
     }
 
     /**
