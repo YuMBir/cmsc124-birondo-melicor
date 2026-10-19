@@ -14,6 +14,9 @@ class Program(private val statements: List<Expr>): Expr{
         }
         return statements.joinToString("\n") { it.toString() }
     }
+    fun getStatements(): List<Expr>{
+        return statements
+    }
 }
 
 class Arguments(private val expressions: List<Expr>) : Expr{
