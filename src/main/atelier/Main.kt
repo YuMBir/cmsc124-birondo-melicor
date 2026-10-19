@@ -42,8 +42,8 @@ fun run(source: String, mode: String = "--print") {
         "--tokenize" -> atelierScanner.printTokens()
         "--parse" -> {
             val atelierParser = Parser(tokens)
-            atelierParser.parse()
-            atelierParser.printAST()
+            val ast = atelierParser.parse()
+            System.out.write(ast.toString().toByteArray(StandardCharsets.UTF_8))
             exitProcess(atelierParser.exitStatus)
         }
         else -> fail("invalid flag")
@@ -76,11 +76,10 @@ fun repl(){
             atelierScanner.tokenize()
             val tokens = atelierScanner.getTokenList()
             atelierScanner.printTokens()
-
-            System.out.write("AST: \n".toByteArray(StandardCharsets.UTF_8))
             atelierParser.setParser(tokens)
-            atelierParser.parse()
-            atelierParser.printAST()
+            val ast = atelierParser.parse()
+            System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
+
         }
         else{
             System.out.write("Exited REPL".toByteArray(StandardCharsets.UTF_8))
