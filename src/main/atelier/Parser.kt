@@ -19,7 +19,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     }
 
-    fun parse(): Expr{
+    fun parse(): Program{
         while (!isAtEnd()) {
             try{
                 //skip blank lines and empty statements
