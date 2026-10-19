@@ -20,6 +20,9 @@ class Arguments(private val expressions: List<Expr>) : Expr{
     override fun toString(): String{
         return expressions.joinToString(separator = ", ", prefix = "(args ", postfix = ")")
     }
+    fun getArgs(): List<Expr>{
+        return expressions
+    }
 }
 class Group(val node: Expr) : Expr{
     override fun toString(): String {

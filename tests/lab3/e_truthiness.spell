@@ -1,0 +1,13 @@
+!false // expect: true
+!null // expect: true
+!"" // expect: false
+!" " // expect: false
+!"hello" // expect: false
+!0 // expect: true
+!1 // expect: false
+!99 // expect: false
+!!0 // expect: false
+!!"" // expect: true
+!!null // expect: false
+null // expect: nil
+!identifier // expect runtime error: Variable is not supported yet.
