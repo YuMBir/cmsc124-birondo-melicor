@@ -68,12 +68,13 @@ class Evaluator {
                 l <= r
             }
             TokenType.AND ->{
-                if (!isTruthy(evaluate(node.left))) return false
-                return isTruthy(evaluate(node.right))
+                val l = evaluate(node.left)
+                return if (!isTruthy(l)) false else isTruthy(evaluate(node.right))
             }
             TokenType.OR -> {
-                if (isTruthy(evaluate(node.left))) return true
-                return isTruthy(evaluate(node.right))
+                val l = evaluate(node.left)
+                return if (isTruthy(l)) true else isTruthy(evaluate(node.right))
+
             }
             TokenType.EQUAL_EQUAL -> isEqual(left, right)
             TokenType.NOT_EQUAL -> !isEqual(left,right)
