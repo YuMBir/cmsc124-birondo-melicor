@@ -1,9 +1,16 @@
 package atelier
+
+import kotlin.system.exitProcess
+
 /*thrown when a valid program hits a bad value at runtime, an example would be negating a string
 it also carries the token so Main.kt can report the line number.
 token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
+    private val exitStatus = 0
+    fun getExitStatus(): Int {
+        return exitStatus
+    }
     fun evaluate (node: Expr): Any? = when(node){
         is Literal -> node.token.getLiteralValue() //return the value stored in the token
         is Group -> evaluate(node.node)//evaluate the inside of the parentheses 
@@ -18,8 +25,16 @@ class Evaluator {
         val statements = program.getStatements()
         val values = mutableListOf<Any?>()
         for (node in statements){
-            values.add(evaluate(node))
+            try {
+                values.add(evaluate(node))
+            } catch (e: RuntimeError) {
+                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
+                exitProcess(70)
+            }
+
         }
+
+
         return values
     }
     private fun evalUnary(node: UnaryOp): Any {

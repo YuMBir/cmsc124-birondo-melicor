@@ -8,10 +8,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
         System.err.println("Parser: [line $lineText] $message")
         error("ParserError")
     }
-    var exitStatus = 0
+    private var exitStatus = 0
     var trees = mutableListOf<Expr>()
     var current = 0
-
+    fun getExitStatus(): Int {
+        return exitStatus
+    }
     fun setParser(newTokens: List<Token>){
         current = 0
         trees.clear()
