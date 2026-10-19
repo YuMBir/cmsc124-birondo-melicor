@@ -7,3 +7,4 @@
 null == null // expect: true
 null == false // expect: false
 true == true // expect: true
+5.0 == 5 // expect: true
