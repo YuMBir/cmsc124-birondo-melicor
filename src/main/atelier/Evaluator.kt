@@ -5,7 +5,6 @@ token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
     fun evaluate (node: Expr): Any? = when(node){
-
         is Literal -> node.token.getLiteralValue() //return the value stored in the token
         is Group -> evaluate(node.node)//evaluate the inside of the parentheses 
         is Arguments -> evalArguments(node)
@@ -14,6 +13,14 @@ class Evaluator {
         is Identifier -> throw RuntimeError(node.token, "Variable is not supported yet.")
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
+    }
+    fun evaluateProgram (program: Program): List<Any?> {
+        val statements = program.getStatements()
+        val values = mutableListOf<Any?>()
+        for (node in statements){
+            values.add(evaluate(node))
+        }
+        return values
     }
     private fun evalUnary(node: UnaryOp): Any {
         val right = evaluate(node.node)
@@ -25,7 +32,6 @@ class Evaluator {
         }
     }
     private fun evalBinary(node: Binary): Any {
-        
         //from left to right
         val left = evaluate(node.left)
         val right = evaluate(node.right)
