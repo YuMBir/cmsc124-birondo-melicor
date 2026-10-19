@@ -57,7 +57,7 @@ fun run(source: String, mode: String = "--print") {
             for (value in values) {
                 System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
             }
-            if (atelierEval.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())
+            if (atelierEval.getExitStatus() != 0) exitProcess(atelierEval.getExitStatus())
 
         }
         else -> fail("invalid flag")
