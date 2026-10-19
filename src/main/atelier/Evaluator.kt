@@ -30,14 +30,6 @@ class Evaluator {
         val left = evaluate(node.left)
         val right = evaluate(node.right)
         val op = node.operator
-        if (op.getType()==TokenType.AND){
-            if (!isTruthy(evaluate(node.left))) return false
-            return isTruthy(evaluate(node.right))
-        }
-        if (op.getType()==TokenType.OR){
-            if (isTruthy(evaluate(node.left))) return true
-            return isTruthy(evaluate(node.right))
-        }
         return when (op.getType()){
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
@@ -74,6 +66,14 @@ class Evaluator {
             TokenType.LESS_EQUAL -> {
                 val (l,r) = checkNumberOperands(op, left, right)
                 l <= r
+            }
+            TokenType.AND ->{
+                if (!isTruthy(evaluate(node.left))) return false
+                return isTruthy(evaluate(node.right))
+            }
+            TokenType.OR -> {
+                if (isTruthy(evaluate(node.left))) return true
+                return isTruthy(evaluate(node.right))
             }
             TokenType.EQUAL_EQUAL -> isEqual(left, right)
             TokenType.NOT_EQUAL -> !isEqual(left,right)
