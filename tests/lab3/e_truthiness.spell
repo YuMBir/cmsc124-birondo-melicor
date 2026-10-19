@@ -9,5 +9,5 @@
 !!0 // expect: false
 !!"" // expect: true
 !!null // expect: false
-null // expect: nil
+null // expect: null
 !identifier // expect runtime error: Variable is not supported yet.
