@@ -3,6 +3,6 @@
 /* expect: hello */
 /* expect: next line */
 "hello" + "\t" +  "next tab" // expect: hello	next tab
-2 + 3 // expect: 5
-"Number: " + 2 // expect: Number: 2
+2 + 3 // expect: 5.0
+"Number: " + 2 // expect: Number: 2.0
 Identifier + 5 // expect runtime error: Variable is not supported yet.
