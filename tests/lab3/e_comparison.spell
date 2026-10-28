@@ -1,0 +1,6 @@
+1 < 2 // expect: true
+2 < 2 // expect: false
+2 <= 2 // expect: true
+3 > 2 // expect: true
+2 >= 3 // expect: false
+c > b // expect runtime error: Variable is not supported yet.

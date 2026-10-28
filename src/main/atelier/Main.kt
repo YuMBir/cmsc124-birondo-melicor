@@ -42,9 +42,23 @@ fun run(source: String, mode: String = "--print") {
         "--tokenize" -> atelierScanner.printTokens()
         "--parse" -> {
             val atelierParser = Parser(tokens)
-            atelierParser.parse()
-            atelierParser.printAST()
-            exitProcess(atelierParser.exitStatus)
+            val ast = atelierParser.parse()
+            System.out.write(ast.toString().toByteArray(StandardCharsets.UTF_8))
+            exitProcess(atelierParser.getExitStatus())
+        }
+        "--eval" -> {
+            if (atelierScanner.hadError) exitProcess(65) // Static errors first, it will reject before running anything (exit 65).
+            val atelierParser = Parser(tokens)
+            val ast = atelierParser.parse()
+            // parser sets exitStatus to 65 on a syntax error, so reject before evaluating
+            if (atelierParser.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())  // 65
+            val atelierEval = Evaluator()
+            val values = atelierEval.evaluateProgram(ast)
+            for (value in values) {
+                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
+            }
+            if (atelierEval.getExitStatus() != 0) exitProcess(atelierEval.getExitStatus())
+
         }
         else -> fail("invalid flag")
     }
@@ -67,6 +81,8 @@ fun repl(){
     var lineNo = 1
     val atelierScanner = Scanner()
     val atelierParser = Parser()
+    val evaluator = Evaluator() //not yet implemented
+
     do  {
         val line: String? = readlnOrNull()
         //exits repl if empty string
@@ -76,11 +92,10 @@ fun repl(){
             atelierScanner.tokenize()
             val tokens = atelierScanner.getTokenList()
             atelierScanner.printTokens()
-
-            System.out.write("AST: \n".toByteArray(StandardCharsets.UTF_8))
             atelierParser.setParser(tokens)
-            atelierParser.parse()
-            atelierParser.printAST()
+            val ast = atelierParser.parse()
+            System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
+
         }
         else{
             System.out.write("Exited REPL".toByteArray(StandardCharsets.UTF_8))

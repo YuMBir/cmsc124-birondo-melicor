@@ -1,11 +1,30 @@
 package atelier
 
+import java.nio.charset.StandardCharsets
+import kotlin.system.exitProcess
+
 sealed interface Expr{
     override fun toString(): String
 }
+class Program(private val statements: List<Expr>): Expr{
+    override fun toString(): String{
+        if (statements.isEmpty()){
+            System.err.println("Error: nothing parsed")
+            exitProcess(65)
+        }
+        return statements.joinToString("\n") { it.toString() }
+    }
+    fun getStatements(): List<Expr>{
+        return statements
+    }
+}
+
 class Arguments(private val expressions: List<Expr>) : Expr{
     override fun toString(): String{
         return expressions.joinToString(separator = ", ", prefix = "(args ", postfix = ")")
+    }
+    fun getArgs(): List<Expr>{
+        return expressions
     }
 }
 class Group(val node: Expr) : Expr{
