@@ -148,11 +148,14 @@ symbol ::= "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
 character ::= letter | digit | symbol | "_" | " " ;
 IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 
-
+<block> ::= LEFT_BRACE <declaration> RIGHT_BRACE
+<declaration> ::= <varDecl> | <statement> ( NEWLINE | SEMICOLON )
+<varDecl> ::= SIGIL IDENTIFIER [ EQUALS <topExpr> ]
 <printStmt> ::= ETCH LEFT_PAREN <expression> RIGHT_PAREN
 <statement> ::= <printStmt> | <exprStmt>
-<exprStmt> ::= <logicOr> ( NEWLINE | SEMICOLON )
-<arguments> ::= <exprStmt> { (COMMA) <exprStmt> }
+<exprStmt> ::= <topExpr> 
+<topExpr> ::= <logicOr>
+<arguments> ::= <topExpr> { (COMMA) <topExpr> }
 <logicOr> ::= <logicAnd> { ( OR ) <logicAnd> }
 <logicAnd> ::= <equality> { ( AND ) <equality> }
 <equality> ::= <relational> { ( EQUAL_EQUAL | NOT_EQUAL ) <relational> }
