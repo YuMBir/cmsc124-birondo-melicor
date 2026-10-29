@@ -81,28 +81,46 @@ fun repl(){
     var lineNo = 1
     val atelierScanner = Scanner()
     val atelierParser = Parser()
-    val evaluator = Evaluator() //not yet implemented
+    val evaluator = Evaluator()
 
     do  {
         val line: String? = readlnOrNull()
         //exits repl if empty string
-        if (!line.isNullOrEmpty()) {
-            atelierScanner.resetTokenizer()
-            atelierScanner.scanLine(line)
-            atelierScanner.tokenize()
-            val tokens = atelierScanner.getTokenList()
-            atelierScanner.printTokens()
-            atelierParser.setParser(tokens)
-            val ast = atelierParser.parse()
-            System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
-
-        }
-        else{
+        if (line.isNullOrEmpty()){
             System.out.write("Exited REPL".toByteArray(StandardCharsets.UTF_8))
             exitProcess(0)
         }
+        atelierScanner.resetTokenizer()
+        atelierScanner.scanLine(line)
+        atelierScanner.tokenize()
+        val tokens = atelierScanner.getTokenList()
+
+        //static error, just report then keep evaluating
+        if (atelierScanner.hadError){
+            atelierScanner.hadError = false
+            lineNo++
+            continue
+        }
+
+        atelierParser.setParser(tokens)
+        val ast = atelierParser.parse()
+
+        if(atelierParser.getExitStatus() != 0){
+            atelierParser.resetExitStatus() 
+            lineNo++
+            continue
+        }
+        //evaluation of each statement
+        for (statement in ast.getStatements()){
+            try{
+                val value = evaluator.evaluate(statement)
+                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
+            }catch(e: RuntimeError) {
+                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
+            }
+        }
         lineNo++
-    } while (lineNo <= limit)
+    }while (lineNo <= limit)
     System.out.write("Line Limit Reached. Exiting REPL".toByteArray(StandardCharsets.UTF_8))
     exitProcess(0)
 }
