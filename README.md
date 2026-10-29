@@ -217,9 +217,9 @@ language.]
 
 ### Scope and bindings
 
-- Redeclaration in the same scope: [allowed or an error]
-- Uninitialized variable holds: [value]
-- Shadowing: [behavior]
+- Redeclaration in the same scope: Error
+- Uninitialized variable holds: `null`
+- Shadowing: Dynamic Scope
 - Undefined name: [static error with exit 65, or runtime error with exit 70]
 
 ### Control flow and functions
