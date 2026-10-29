@@ -1,8 +1,5 @@
 package atelier
 
-import java.nio.charset.StandardCharsets
-import kotlin.system.exitProcess
-
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
         System.err.println("Parser: [line $lineText] $message")
@@ -118,13 +115,13 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
-        args.add(firstArg())
+        args.add(highArg())
         while (match(TokenType.COMMA)){
-            args.add(firstArg())
+            args.add(highArg())
         }
         return Arguments(args)
     }
-    fun firstArg(): Expr{
+    fun highArg(): Expr{
         return logicOr() //highest precedence for arguments here
     }
     fun logicOr(): Expr{
