@@ -166,6 +166,7 @@ IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 <mulTerm> ::= <unaryTerm> { ( STAR | SLASH ) <unaryTerm> }
 <unaryTerm> ::= { ( MINUS | BANG ) } <primary>
 <primary> ::= NUMBER | LEFT_PAREN <expression> RIGHT_PAREN | IDENTIFIER | NULL | STRING
+
 ```
 
 ## Parse output format

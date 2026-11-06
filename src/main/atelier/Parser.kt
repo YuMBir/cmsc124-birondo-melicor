@@ -121,9 +121,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             consume(TokenType.RIGHT_PAREN)
             return Etch(value)
         }
-
         // sigil and '{' checks go here
-
         // default
         return ExprStmt(highest())
     }
