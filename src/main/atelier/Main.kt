@@ -93,6 +93,7 @@ fun repl(){
         atelierScanner.resetTokenizer()
         atelierScanner.scanLine(line)
         atelierScanner.tokenize()
+        atelierScanner.printTokens()
         val tokens = atelierScanner.getTokenList()
 
         //static error, just report then keep evaluating
@@ -104,7 +105,7 @@ fun repl(){
 
         atelierParser.setParser(tokens)
         val ast = atelierParser.parse()
-
+        System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
         if(atelierParser.getExitStatus() != 0){
             atelierParser.resetExitStatus()
             lineNo++
