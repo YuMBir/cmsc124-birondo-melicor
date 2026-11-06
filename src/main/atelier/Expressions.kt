@@ -44,6 +44,9 @@ class Identifier(val token: Token) : Expr {
     override fun toString(): String {
         return token.getLexeme()
     }
+    fun getName(): String {
+        return token.getLexeme()
+    }
 }
 
 

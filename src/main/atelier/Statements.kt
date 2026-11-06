@@ -1,8 +1,5 @@
 package atelier
 
-import kotlin.system.exitProcess
-
-
 
 enum class SigilType{
     ELEMENT,
@@ -32,10 +29,12 @@ class Block(val statements: List<Expr>): Stmt{
         return statements.joinToString(separator = "\n", prefix = "{", postfix = "}")
     }
 }
-class Sigil(val name: String): Stmt{
+class Sigil(private val name: String, private val expr: Expr? = null): Stmt{
     override fun toString(): String {
         return "(sigil $name)"
     }
+    fun getName(): String = name
+    fun getExpr(): Expr? = expr
 }
 
 class Etch(private val args: Expr): Stmt{

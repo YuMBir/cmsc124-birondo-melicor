@@ -23,6 +23,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun parse(): Program{
+        if(isAtEnd()){
+            exitStatus = 65 //for empty programs
+        }
         while (!isAtEnd()) {
             try{
                 //skip blank lines and empty statements
@@ -86,7 +89,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     /**
-     * Advances to next token.
+     * Advances to next token and returns.
      * Returns error if token type is incorrect.
      */
     fun consume(vararg type: TokenType): Token{
@@ -116,15 +119,35 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun declaration(): Stmt {
         if (match(TokenType.ETCH)) {
-            consume(TokenType.LEFT_PAREN)
-            val value = topExpr()
-            consume(TokenType.RIGHT_PAREN)
-            return Etch(value)
+            return prntStmt()
+        }
+        if (match(TokenType.SIGIL)){
+            return varDecl()
         }
         // sigil and '{' checks go here
         // default
         return ExprStmt(highest())
     }
+    fun varDecl(): Stmt {
+        val id = consume(TokenType.IDENTIFIER).getLexeme() //name
+        if(peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)){
+            //declaration without assignment
+            return Sigil(id)
+        }else{
+            consume(TokenType.EQUAL)
+            val value = topExpr()
+            return Sigil(id, value)
+        }
+
+    }
+
+    fun prntStmt(): Stmt{
+        consume(TokenType.LEFT_PAREN)
+        val value = topExpr()
+        consume(TokenType.RIGHT_PAREN)
+        return Etch(value)
+    }
+
     fun highest(): Expr{
         return arguments()
     }

@@ -1,7 +1,6 @@
 package atelier
 
 import java.nio.charset.StandardCharsets
-import kotlin.system.exitProcess
 
 /*thrown when a valid program hits a bad value at runtime, an example would be negating a string
 it also carries the token so Main.kt can report the line number.
@@ -9,6 +8,7 @@ token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
     private var exitStatus = 0
+    private var environment = Environment()
     fun getExitStatus(): Int {
         return exitStatus
     }
@@ -18,7 +18,7 @@ class Evaluator {
         is Arguments -> evalArguments(node)
         is UnaryOp -> evalUnary(node)
         is Binary-> evalBinary(node)
-        is Identifier -> throw RuntimeError(node.token, "Variable is not supported yet.")
+        is Identifier -> environment.get(node.getName())
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
@@ -144,7 +144,19 @@ class Evaluator {
                 val value = evaluate(stmt.getArgs())
                 System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
             }
+            is Sigil -> {
+                if (stmt.getExpr() == null){
+                    environment.define(stmt.getName())
+                }
+                else{
+                    environment.define(stmt.getName(), evaluate(stmt.getExpr()!!))
+                }
+            }
             else -> System.out.write("$stmt\n".toByteArray(StandardCharsets.UTF_8))
         }
+    }
+
+    fun executeBlock(block: Block){
+
     }
 }
