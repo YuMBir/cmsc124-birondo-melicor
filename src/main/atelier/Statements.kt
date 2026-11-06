@@ -2,18 +2,7 @@ package atelier
 
 import kotlin.system.exitProcess
 
-class Program(private val statements: List<Expr>){
-    override fun toString(): String{
-        if (statements.isEmpty()){
-            System.err.println("Error: nothing parsed")
-            exitProcess(65)
-        }
-        return statements.joinToString("\n") { it.toString() }
-    }
-    fun getStatements(): List<Expr>{
-        return statements
-    }
-}
+
 
 enum class SigilType{
     ELEMENT,
@@ -27,7 +16,11 @@ sealed interface Stmt {
 }
 
 
-
+class ExprStmt(var expr: Expr): Stmt {
+    override fun toString(): String{
+        return expr.toString()
+    }
+}
 
 class CircleFun(val name: String, var params: List<Expr>, var block: Block): Stmt{
     override fun toString(): String {
@@ -42,5 +35,11 @@ class Block(val statements: List<Expr>): Stmt{
 class Sigil(val name: String): Stmt{
     override fun toString(): String {
         return "(sigil $name)"
+    }
+}
+
+class Etch(val args: Expr): Stmt{
+    override fun toString(): String {
+        return "etch ($args)"
     }
 }

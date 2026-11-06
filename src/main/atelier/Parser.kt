@@ -6,7 +6,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         error("ParserError")
     }
     private var exitStatus = 0
-    var trees = mutableListOf<Expr>()
+    var trees = mutableListOf<Stmt>()
     var current = 0
     fun getExitStatus(): Int {
         return exitStatus
@@ -28,7 +28,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
                 //skip blank lines and empty statements
                 while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
                 if (isAtEnd()) break
-                trees.add(highest())
+                trees.add(declaration())
                 if (isAtEnd()) break
                 if(match(TokenType.SEMICOLON, TokenType.NEWLINE)){
                     //one trailing ';' is fine but consecutive ;; are not allowed
@@ -113,19 +113,33 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun isAtEnd() = peek().getType() == TokenType.EOF
 
+
+    fun declaration(): Stmt {
+        if (match(TokenType.ETCH)) {
+            consume(TokenType.LEFT_PAREN)
+            val value = topExpr()
+            consume(TokenType.RIGHT_PAREN)
+            return Etch(value)
+        }
+
+        // sigil and '{' checks go here
+
+        // default
+        return ExprStmt(highest())
+    }
     fun highest(): Expr{
         return arguments()
     }
 
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
-        args.add(highArg())
+        args.add(topExpr())
         while (match(TokenType.COMMA)){
-            args.add(highArg())
+            args.add(topExpr())
         }
         return Arguments(args)
     }
-    fun highArg(): Expr{
+    fun topExpr(): Expr{
         return logicOr() //highest precedence for arguments here
     }
     fun logicOr(): Expr{
