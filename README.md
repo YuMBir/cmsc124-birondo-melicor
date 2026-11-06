@@ -186,7 +186,7 @@ language.]
 
 | Value        | Truthiness |
 |--------------|------------|
-| `""`         | True       |
+| `""`         | False      |
 | `" "`        | True       |
 | `"hello"`    | True       |
 | `true`       | True       |

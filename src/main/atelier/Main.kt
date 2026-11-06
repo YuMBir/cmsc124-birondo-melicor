@@ -81,7 +81,7 @@ fun repl(){
     var lineNo = 1
     val atelierScanner = Scanner()
     val atelierParser = Parser()
-    val evaluator = Evaluator()
+    val atelierEval = Evaluator()
 
     do  {
         val line: String? = readlnOrNull()
@@ -93,6 +93,7 @@ fun repl(){
         atelierScanner.resetTokenizer()
         atelierScanner.scanLine(line)
         atelierScanner.tokenize()
+        atelierScanner.printTokens()
         val tokens = atelierScanner.getTokenList()
 
         //static error, just report then keep evaluating
@@ -104,20 +105,17 @@ fun repl(){
 
         atelierParser.setParser(tokens)
         val ast = atelierParser.parse()
-
+        System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
         if(atelierParser.getExitStatus() != 0){
-            atelierParser.resetExitStatus() 
+            atelierParser.resetExitStatus()
             lineNo++
             continue
+
         }
         //evaluation of each statement
-        for (statement in ast.getStatements()){
-            try{
-                val value = evaluator.evaluate(statement)
-                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
-            }catch(e: RuntimeError) {
-                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
-            }
+        val values = atelierEval.evaluateProgram(ast)
+        for (value in values) {
+            System.out.write("Evaluation:\n$value\n".toByteArray(StandardCharsets.UTF_8))
         }
         lineNo++
     }while (lineNo <= limit)
