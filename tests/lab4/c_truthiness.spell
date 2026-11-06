@@ -6,3 +6,5 @@ sigil anotherVariable = false
 etch(hasVariable == anotherVariable) // expect: false
 etch(hasVariable and anotherVariable) // expect: false
 etch(hasVariable or anotherVariable) // expect: true
+anotherVariable = true 
+etch(hasVariable and anotherVariable) // expect: true
