@@ -1,24 +1,10 @@
 package atelier
 
-import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
 sealed interface Expr{
     override fun toString(): String
 }
-class Program(private val statements: List<Expr>): Expr{
-    override fun toString(): String{
-        if (statements.isEmpty()){
-            System.err.println("Error: nothing parsed")
-            exitProcess(65)
-        }
-        return statements.joinToString("\n") { it.toString() }
-    }
-    fun getStatements(): List<Expr>{
-        return statements
-    }
-}
-
 class Arguments(private val expressions: List<Expr>) : Expr{
     override fun toString(): String{
         return expressions.joinToString(separator = ", ", prefix = "(args ", postfix = ")")
@@ -52,30 +38,13 @@ class UnaryOp(val operator: Token, val node: Expr) : Expr{
         return "(${operator.getLexeme()} $node)"
     }
 }
-class CircleNode(val name: String, var params: List<Expr>, var block: Block): Expr{
-    override fun toString(): String {
-        return name
-    }
-}
-class Block(val statements: List<Expr>): Expr{
-    override fun toString(): String {
-        return statements.joinToString(separator = "\n", prefix = "{", postfix = "}")
-    }
-}
-class Sigil(val name: String, val type: SigilType): Expr{
-    override fun toString(): String {
-        return "(sigil: $type $name)"
-    }
-}
+
 //ADDED THE NEW CODE HERE
 class Identifier(val token: Token) : Expr {
     override fun toString(): String {
         return token.getLexeme()
     }
 }
-enum class SigilType{
-    ELEMENT,
-    DIRECTION
-}
+
 
 
