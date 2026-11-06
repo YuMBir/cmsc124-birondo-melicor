@@ -24,10 +24,11 @@ class CircleFun(val name: String, var params: List<Expr>, var block: Block): Stm
         return name
     }
 }
-class Block(val statements: List<Expr>): Stmt{
+class Block(private val statements: List<Stmt>): Stmt{
     override fun toString(): String {
         return statements.joinToString(separator = "\n", prefix = "{", postfix = "}")
     }
+    fun getStatements(): List<Stmt> = statements
 }
 class Sigil(private val name: String, private val expr: Expr? = null): Stmt{
     override fun toString(): String {
@@ -47,4 +48,12 @@ class Etch(private val args: Expr): Stmt{
     fun getString(): String {
         return args.toString()
     }
+}
+
+class Assignment(private val name: String, private val expr: Expr): Stmt{
+    override fun toString(): String {
+        return "$name = $expr"
+    }
+    fun getName(): String = name
+    fun getExpr(): Expr = expr
 }
