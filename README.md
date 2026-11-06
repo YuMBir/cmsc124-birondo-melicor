@@ -148,10 +148,11 @@ symbol ::= "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
 character ::= letter | digit | symbol | "_" | " " ;
 IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 
-<block> ::= LEFT_BRACE <declaration> RIGHT_BRACE
-<declaration> ::= <varDecl> | <statement> ( NEWLINE | SEMICOLON )
-<varDecl> ::= SIGIL IDENTIFIER [ EQUALS <topExpr> ]
-<printStmt> ::= ETCH LEFT_PAREN <expression> RIGHT_PAREN
+<block> ::= LEFT_BRACE { <declaration> ( NEWLINE | SEMICOLON ) }  RIGHT_BRACE
+<declaration> ::= <varDecl> | <statement> | <assignment> 
+<varDecl> ::= SIGIL IDENTIFIER [ EQUAL <topExpr> ]
+<assignment> ::= IDENTIFIER EQUALS <topExpr>
+<printStmt> ::= ETCH LEFT_PAREN <topExpr> RIGHT_PAREN
 <statement> ::= <printStmt> | <exprStmt>
 <exprStmt> ::= <topExpr> 
 <topExpr> ::= <logicOr>
@@ -164,7 +165,7 @@ IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 <addTerm> ::= <mulTerm> { ( PLUS | MINUS ) <mulTerm> }
 <mulTerm> ::= <unaryTerm> { ( STAR | SLASH ) <unaryTerm> }
 <unaryTerm> ::= { ( MINUS | BANG ) } <primary>
-<primary> ::= NUMBER | LEFT_PAREN <expression> RIGHT_PAREN | IDENTIFIER
+<primary> ::= NUMBER | LEFT_PAREN <expression> RIGHT_PAREN | IDENTIFIER | NULL | STRING
 ```
 
 ## Parse output format
@@ -219,7 +220,7 @@ language.]
 
 - Redeclaration in the same scope: Error
 - Uninitialized variable holds: `null`
-- Shadowing: Dynamic Scope
+- Shadowing: an inner declaration hides an outer binding of the same name until its block ends; the outer binding is untouched and visible again afterward
 - Undefined name: [static error with exit 65, or runtime error with exit 70]
 
 ### Control flow and functions
