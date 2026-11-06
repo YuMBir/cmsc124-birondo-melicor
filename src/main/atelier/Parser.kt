@@ -31,7 +31,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
                 //skip blank lines and empty statements
                 while (match(TokenType.NEWLINE, TokenType.SEMICOLON)) { }
                 if (isAtEnd()) break
-                trees.add(declaration())
+                trees.add(highest())
                 if (isAtEnd()) break
                 if(match(TokenType.SEMICOLON, TokenType.NEWLINE)){
                     //one trailing ';' is fine but consecutive ;; are not allowed
@@ -116,6 +116,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun isAtEnd() = peek().getType() == TokenType.EOF
 
+    fun highest(): Stmt{
+        return declaration()
+    }
+
+    fun block(): Stmt{
+        val statements = mutableListOf<Stmt>()
+        consume(TokenType.LEFT_BRACE)
+        while (peek().getType() != TokenType.RIGHT_BRACE){
+            statements.add(declaration())
+        }
+        return Block(statements)
+    }
 
     fun declaration(): Stmt {
         if (match(TokenType.ETCH)) {
@@ -126,7 +138,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         }
         // sigil and '{' checks go here
         // default
-        return ExprStmt(highest())
+        return ExprStmt(topExpr())
     }
     fun varDecl(): Stmt {
         val id = consume(TokenType.IDENTIFIER).getLexeme() //name
@@ -147,11 +159,6 @@ class Parser(private var tokens: List<Token> = listOf()) {
         consume(TokenType.RIGHT_PAREN)
         return Etch(value)
     }
-
-    fun highest(): Expr{
-        return arguments()
-    }
-
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
         args.add(topExpr())

@@ -137,9 +137,22 @@ class Evaluator {
             execute(statement)
         }
     }
+    fun executeBlock(block: Block, blockEnv: Environment) {
+        val statements = block.getStatements()
+        val prevEnv = this.environment
+        try{
+            this.environment = blockEnv
+            for (statement in statements){
+                execute(statement)
+            }
+        }finally {
+            this.environment = prevEnv
+        }
+    }
 
     fun execute(stmt: Stmt){
         when (stmt){
+            is Block -> executeBlock(stmt, this.environment)
             is Etch -> {
                 val value = evaluate(stmt.getArgs())
                 System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
@@ -156,7 +169,5 @@ class Evaluator {
         }
     }
 
-    fun executeBlock(block: Block){
 
-    }
 }
