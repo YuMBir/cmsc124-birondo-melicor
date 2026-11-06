@@ -136,21 +136,29 @@ class Parser(private var tokens: List<Token> = listOf()) {
         if (match(TokenType.SIGIL)){
             return varDecl()
         }
-        // sigil and '{' checks go here
+        if (match(TokenType.IDENTIFIER)){
+            return assignment()
+        }
         // default
         return ExprStmt(topExpr())
     }
     fun varDecl(): Stmt {
-        val id = consume(TokenType.IDENTIFIER).getLexeme() //name
+        val name = consume(TokenType.IDENTIFIER).getLexeme() //name
         if(peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)){
             //declaration without assignment
-            return Sigil(id)
+            return Sigil(name)
         }else{
             consume(TokenType.EQUAL)
             val value = topExpr()
-            return Sigil(id, value)
+            return Sigil(name, value)
         }
 
+    }
+    fun assignment(): Stmt {
+        val name = previous().getLexeme() //name
+        consume(TokenType.EQUAL)
+        val value = topExpr()
+        return Assignment(name, value)
     }
 
     fun prntStmt(): Stmt{

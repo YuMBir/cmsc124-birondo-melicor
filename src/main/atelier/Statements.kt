@@ -49,3 +49,11 @@ class Etch(private val args: Expr): Stmt{
         return args.toString()
     }
 }
+
+class Assignment(private val name: String, private val expr: Expr): Stmt{
+    override fun toString(): String {
+        return "$name = $expr"
+    }
+    fun getName(): String = name
+    fun getExpr(): Expr = expr
+}

@@ -165,6 +165,9 @@ class Evaluator {
                     environment.define(stmt.getName(), evaluate(stmt.getExpr()!!))
                 }
             }
+            is Assignment -> {
+                environment.assign(stmt.getName(), evaluate(stmt.getExpr()))
+            }
             else -> System.out.write("$stmt\n".toByteArray(StandardCharsets.UTF_8))
         }
     }
