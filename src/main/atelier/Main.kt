@@ -81,7 +81,7 @@ fun repl(){
     var lineNo = 1
     val atelierScanner = Scanner()
     val atelierParser = Parser()
-    val evaluator = Evaluator() //not yet implemented
+    val atelierEval = Evaluator()
 
     do  {
         val line: String? = readlnOrNull()
@@ -95,6 +95,11 @@ fun repl(){
             atelierParser.setParser(tokens)
             val ast = atelierParser.parse()
             System.out.write("AST: $ast \n".toByteArray(StandardCharsets.UTF_8))
+
+            val values = atelierEval.evaluateProgram(ast)
+            for (value in values) {
+                System.out.write("Evaluation:\n$value\n".toByteArray(StandardCharsets.UTF_8))
+            }
 
         }
         else{
