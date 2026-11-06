@@ -127,6 +127,7 @@ class Evaluator {
         null -> false
         is Boolean -> v
         is Double -> !(v == 0.0 || v.isNaN())
+        is String -> v.isNotEmpty()
         else -> true
     }
 
