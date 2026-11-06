@@ -202,9 +202,9 @@ language.]
 ### Operator semantics
 
 - Arithmetic: `+ - * /`
-- `+` on strings: [concatenation, error, or coercion]
-- Mixed types: Number types are automatically type-casted to the bigger type
-- Comparison: Integer and Character
+- `+` on strings: concatenation
+- Mixed types: Numbers are coerced into Strings in `+` operations symmetrically
+- Comparison: `NUMBER`
 - Equality across types: [false, or an error]
 - Division by zero: Produces a runtime error
 
