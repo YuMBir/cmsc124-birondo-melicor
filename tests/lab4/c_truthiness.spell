@@ -1,0 +1,8 @@
+sigil hasVariable = true
+etch(hasVariable) // expect: true
+etch(!hasVariable) // expect: false
+etch(!hasVariable==false) // expect: true
+sigil anotherVariable = false
+etch(hasVariable == anotherVariable) // expect: false
+etch(hasVariable and anotherVariable) // expect: false
+etch(hasVariable or anotherVariable) // expect: true
