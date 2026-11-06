@@ -1,5 +1,6 @@
 package atelier
 
+import java.nio.charset.StandardCharsets
 import kotlin.system.exitProcess
 
 /*thrown when a valid program hits a bad value at runtime, an example would be negating a string
@@ -21,20 +22,19 @@ class Evaluator {
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
-    fun evaluateProgram (program: Program): List<Any?> {
-        val statements = program.getStatements()
+    fun evaluateProgram(program: Program): List<Any?> {
         val values = mutableListOf<Any?>()
-        for (node in statements){
+        for (stmt in program.getStatements()) {
             try {
-                values.add(evaluate(node))
+                when (stmt) {
+                    is ExprStmt -> values.add(evaluate(stmt.expr))  // Lab 3 behavior: keep the value
+                    else -> execute(stmt)                            // etch, etc.: run for effect, no value collected
+                }
             } catch (e: RuntimeError) {
-                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
+                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
                 exitStatus = 70
             }
-
         }
-
-
         return values
     }
     private fun evalUnary(node: UnaryOp): Any {
@@ -131,11 +131,20 @@ class Evaluator {
         else -> true
     }
 
+    fun executeProgram(program: Program) {
+        val statements = program.getStatements()
+        for (statement in statements){
+            execute(statement)
+        }
+    }
 
-
-    
-
-
-
-
+    fun execute(stmt: Stmt){
+        when (stmt){
+            is Etch -> {
+                val value = evaluate(stmt.getArgs())
+                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
+            }
+            else -> System.out.write("$stmt\n".toByteArray(StandardCharsets.UTF_8))
+        }
+    }
 }

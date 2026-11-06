@@ -38,8 +38,14 @@ class Sigil(val name: String): Stmt{
     }
 }
 
-class Etch(val args: Expr): Stmt{
+class Etch(private val args: Expr): Stmt{
     override fun toString(): String {
         return "etch ($args)"
+    }
+    fun getArgs(): Expr {
+        return args
+    }
+    fun getString(): String {
+        return args.toString()
     }
 }
