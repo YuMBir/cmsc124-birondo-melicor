@@ -2,3 +2,8 @@ sigil x = 3
 sigil y = 4
 etch(x+y) // expect: 7.0
 etch(x*2) // expect: 6.0
+sigil x2 = 30
+etch(x2) // expect: 30.0
+etch(x>y) // expect: false
+x = 100
+etch(x) // expect: 100.0
