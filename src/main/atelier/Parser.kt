@@ -14,10 +14,14 @@ class Parser(private var tokens: List<Token> = listOf()) {
     fun getExitStatus(): Int {
         return exitStatus
     }
+    fun resetExitStatus(){
+        exitStatus = 0
+    }
     fun setParser(newTokens: List<Token>){
         current = 0
         trees.clear()
         tokens = newTokens
+        exitStatus = 0
 
     }
 

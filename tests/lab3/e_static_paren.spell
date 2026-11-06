@@ -1,0 +1,1 @@
+( 1 + 7 // expect error: Unexpected token: NUMBER
