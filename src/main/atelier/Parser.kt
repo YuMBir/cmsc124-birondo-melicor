@@ -140,7 +140,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             return assignment()
         }
         // default
-        return ExprStmt(topExpr())
+        return ExprStmt(arguments())
     }
     fun varDecl(): Stmt {
         val name = consume(TokenType.IDENTIFIER).getLexeme() //name
