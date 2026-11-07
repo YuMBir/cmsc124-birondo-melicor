@@ -1,0 +1,8 @@
+sigil a = 3
+etch(a) // expect: 3.0
+a = a + 1
+etch(a) // expect: 4.0
+sigil b
+b = a
+b = b + 1
+etch(b) // expect: 5.0
