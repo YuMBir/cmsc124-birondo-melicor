@@ -33,8 +33,9 @@ class Block(private val statements: List<Stmt>): Stmt{
 // from name: String to token: Token. So errors have line numbers 
 class Sigil(private val token: Token, private val expr: Expr? = null): Stmt{
     private val name = token.getLexeme()
+    fun getToken(): Token = token
     override fun toString(): String {
-        if (expr != null){
+        if (expr == null){
             return "(sigil $name)"     
         } else {
             return "(sigil $name $expr)"
@@ -58,9 +59,10 @@ class Etch(private val args: Expr): Stmt{
 // from name: String to token: Token. So errors have line numbers 
 class Assignment(private val token: Token, private val expr: Expr): Stmt{
     private val name = token.getLexeme()
+    fun getToken(): Token = token
+    fun getName(): String = name
+    fun getExpr(): Expr = expr
     override fun toString(): String {
         return "$name = $expr"
     }
-    fun getName(): String = name
-    fun getExpr(): Expr = expr
 }

@@ -143,22 +143,22 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return ExprStmt(arguments())
     }
     fun varDecl(): Stmt {
-        val name = consume(TokenType.IDENTIFIER).getLexeme() //name
+        val nameToken = consume(TokenType.IDENTIFIER) //keep the Token
         if(peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)){
             //declaration without assignment
-            return Sigil(name)
+            return Sigil(nameToken)
         }else{
             consume(TokenType.EQUAL)
             val value = topExpr()
-            return Sigil(name, value)
+            return Sigil(nameToken, value)
         }
 
     }
     fun assignment(): Stmt {
-        val name = previous().getLexeme() //name
+        val nameToken = previous() //keep the Token
         consume(TokenType.EQUAL)
         val value = topExpr()
-        return Assignment(name, value)
+        return Assignment(nameToken, value)
     }
 
     fun prntStmt(): Stmt{
