@@ -26,8 +26,8 @@ class Evaluator {
         for (stmt in program.getStatements()) {
             try {
                 when (stmt) {
-                    is ExprStmt -> values.add(evaluate(stmt.expr))  // Lab 3 behavior: keep the value
-                    else -> execute(stmt)                            // etch, etc.: run for effect, no value collected
+                    is ExprStmt -> values.add(evaluate(stmt.expr)) 
+                    else -> execute(stmt)                          
                 }
             } catch (e: RuntimeError) {
                 System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
@@ -47,9 +47,8 @@ class Evaluator {
     private fun evalBinary(node: Binary): Any {
         val op = node.operator
 
-        // and/or short-circuit: the right side is only evaluated when needed.
-        // Handled BEFORE evaluating both sides, otherwise `false and nope` would
-        // still look up `nope` and throw an undefined-variable error.
+        // Examples:  false and (1 / 0)  ->  false   (right side never runs)
+       //                      true or nope       ->  true    (right side never runs)
         if (op.getType() == TokenType.AND) {
             return isTruthy(evaluate(node.left)) && isTruthy(evaluate(node.right))
         }
@@ -128,7 +127,7 @@ class Evaluator {
         else -> true
     }
 
-    // Plain ./run file: stop at the first runtime error. Main then exits with exitStatus (70).
+    // Plain ./run file, stop at the first runtime error. Main then exits with exitStatus (70).
     fun executeProgram(program: Program) {
         for (statement in program.getStatements()) {
             try {
@@ -173,7 +172,7 @@ class Evaluator {
             is Assignment -> {
                 environment.assign(stmt.getToken(), evaluate(stmt.getExpr()))
             }
-            else -> throw RuntimeError(null, "Cannot execute this statement yet.") // only CircleFun, until Lab 5
+            else -> throw RuntimeError(null, "Cannot execute this statement yet.") 
         }
     }
 }
