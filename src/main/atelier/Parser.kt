@@ -120,11 +120,22 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun block(): Stmt{
-        val statements = mutableListOf<Stmt>()
         consume(TokenType.LEFT_BRACE)
-        while (peek().getType() != TokenType.RIGHT_BRACE){
+        val statements = mutableListOf<Stmt>()
+        while (true){
+            while (match(TokenType.NEWLINE, TokenType.SEMICOLON)){ } //skip blank lines
+            if (peek().getType() == TokenType.RIGHT_BRACE || isAtEnd()){
+                break
+            }
             statements.add(declaration())
+            if(!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE){
+                reportError(peek().getStartLine(), "Expected newline or ';' after statement.")
+            }
         }
+        if (isAtEnd()){
+            reportError(peek().getLine(), "Expected '}' at end of block.")
+        }
+        consume(TokenType.RIGHT_BRACE)
         return Block(statements)
     }
 
