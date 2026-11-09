@@ -149,13 +149,17 @@ character ::= letter | digit | symbol | "_" | " " ;
 IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 
 <block> ::= LEFT_BRACE { <declaration> ( NEWLINE | SEMICOLON ) }  RIGHT_BRACE
-<declaration> ::= <varDecl> | <statement> | <assignment> 
+<body> ::= LEFT_BRACE { <declaration> ( NEWLINE | SEMICOLON ) }  RIGHT_BRACE //doesn't make a new scope
+<declaration> ::= <varDecl> | <statement> | <assignment>
+<statement> ::= <printStmt> | <exprStmt> | <ifStmt>
 <varDecl> ::= SIGIL IDENTIFIER [ EQUAL <topExpr> ]
 <assignment> ::= IDENTIFIER EQUALS <topExpr>
 <printStmt> ::= ETCH LEFT_PAREN <topExpr> RIGHT_PAREN
-<statement> ::= <printStmt> | <exprStmt>
+<ifStmt> ::= SCRY LEFT_PAREN <exprStmt> RIGHT_PAREN <body> { ELSE SCRY LEFT_PAREN <exprStmt> RIGHT_PAREN <body> } [ELSE <body>]
 <exprStmt> ::= <topExpr> 
 <topExpr> ::= <logicOr>
+
+
 <arguments> ::= <topExpr> { (COMMA) <topExpr> }
 <logicOr> ::= <logicAnd> { ( OR ) <logicAnd> }
 <logicAnd> ::= <equality> { ( AND ) <equality> }
