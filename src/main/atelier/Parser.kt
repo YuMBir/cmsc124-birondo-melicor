@@ -139,7 +139,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
         if (match(TokenType.SIGIL)){
             return varDecl()
         }
-        if (match(TokenType.IDENTIFIER)){
+        if (peek().getType() == TokenType.IDENTIFIER && peek(1).getType() == TokenType.EQUAL){
             return assignment()
         }
         // default
