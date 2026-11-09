@@ -48,15 +48,13 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return Program(trees)
     }
     fun synchronize(){
-        exitStatus = 65
+        exitStatus = 65 // any syntax or error means the program is rejected before running
+        //skips to the end of the broken statement and parse()'s loop skips the terminator
+        // and resumes, so no recursion is needed. And the loop always makes progress. 
         while (!isAtEnd() && peek().getType() !in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)) { //remove the EOF 
             advance() //discard tokens until we find a semicolon or newline
-            //discard()
         }
-        //if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
-          //  parse()
-        //}
-        //parse()
+        
     }
 
     /**
