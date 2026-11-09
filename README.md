@@ -307,6 +307,6 @@ approval of your own work.]
 ## Changelog
 
 
-| Activity | What changed in the language |
-|---|---|
-| Lab 1 | [entry] |
+| Activity | What changed in the language                     |
+|----------|--------------------------------------------------|
+| Lab 4    | Expressions aren't all wrapped in `args` anymore |
