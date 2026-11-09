@@ -1,0 +1,4 @@
+{
+  sigil y = 1
+}
+etch (y) // expect runtime error: Undefined variable 'y'.
