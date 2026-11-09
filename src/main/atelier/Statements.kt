@@ -25,10 +25,27 @@ class CircleFun(val name: String, var params: List<Expr>, var block: Block): Stm
     }
 }
 class Block(private val statements: List<Stmt>): Stmt{
-    override fun toString(): String {
-        return statements.joinToString(separator = "\n", prefix = "{", postfix = "}")
+    consume(TokenType.LEFT_BRACE)
+    val statements = mutableListOf<Stmt>()
+    while (true){
+        while (match(TokenType.NEWLINE, TokenType.SEMICOLON)){ } //skip blank lines
+        if (peek().getType() == TokenType.RIGHT_BRACE || isAtEnd()){
+            break
+        }
+        statements.add(declaration())
+        if(!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE){
+            reportError(peek().getStartLine(), "Expected newline or ';' after statement.")
+        }
     }
-    fun getStatements(): List<Stmt> = statements
+    if (isAtEnd()){
+        reportError(peek().getLine(), "Expected '}' at end of block.")
+    }
+    consume(TokenType.RIGHT_BRACE)
+    return Block(statements)
+    //override fun toString(): String {
+      //  return statements.joinToString(separator = "\n", prefix = "{", postfix = "}")
+    //}
+    //fun getStatements(): List<Stmt> = statements
 }
 // from name: String to token: Token. So errors have line numbers 
 class Sigil(private val token: Token, private val expr: Expr? = null): Stmt{
