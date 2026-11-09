@@ -68,6 +68,9 @@ fun run(source: String, mode: String = "--exec") {
             if (atelierParser.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())  // 65
             val atelierEval = Evaluator()
             atelierEval.executeProgram(ast)
+            // executeProgram already printed the error and stopped at the first one;
+            // turn the recorded status into the process exit code (70) so the harness sees it
+            if (atelierEval.getExitStatus() != 0) exitProcess(atelierEval.getExitStatus()) // 70
         }
 
         else -> fail("invalid flag")
