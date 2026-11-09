@@ -1,0 +1,10 @@
+sigil score = 60
+sigil newScore;
+newScore = score
+etch(newScore) // expect: 60.0
+sigil overallGrade
+{ overallGrade = newScore * 0.8}
+etch(overallGrade) // expect: 48.0
+sigil rawScore = overallGrade
+sigil pass = 60==rawScore
+etch(pass) // expect: false
