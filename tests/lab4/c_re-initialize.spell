@@ -1,0 +1,5 @@
+sigil x = 10
+{
+    sigil x = x + 1
+    etch(x) // expect: 11.0
+}
