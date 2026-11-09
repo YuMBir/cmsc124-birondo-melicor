@@ -129,7 +129,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             }
             statements.add(declaration())
             if(!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE){
-                reportError(peek().getStartLine(), "Expected newline or ';' after statement.")
+                reportError(peek().getLine(), "Expected newline or ';' after statement.")
             }
         }
         if (isAtEnd()){
