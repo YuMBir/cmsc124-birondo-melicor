@@ -1,0 +1,2 @@
+sigil z
+etch (z) // expect: null

@@ -1,42 +1,40 @@
 package atelier
 
-class Environment (private val enclosingEnv: Environment? = null){
+class Environment(private val enclosingEnv: Environment? = null) {
     private val values = mutableMapOf<String, Any?>()
+
     /**
-     * Creates a new key `name` in values map, throws `RuntimeException` if it already exists in environment
+     * Creates a new binding in THIS environment only (never walks outward).
+     * Throws RuntimeError if the name already exists in this same scope.
      */
-    fun define (name: String, value: Any? = null){
-        if (values.containsKey(name)){
-            throw RuntimeException("Environment already defined for name $name")
+    fun define(token: Token, value: Any? = null) {
+        val name = token.getLexeme()
+        if (values.containsKey(name)) {
+            throw RuntimeError(token, "Variable '$name' already defined in this environment.")
         }
         values[name] = value
     }
 
-    fun get(name: String): Any? {
-        val env = lookup(name)
-        return env.values[name]
+    fun get(name: String, token: Token? = null): Any? = lookup(name, token).values[name]
+
+    /**
+     * Updates the innermost existing binding. Never creates one.
+     */
+    fun assign(token: Token, value: Any?) {
+        val name = token.getLexeme()
+        lookup(name, token).values[name] = value
     }
 
     /**
-     * Looks up if `name` key exists.  Changes the value assigned to key `name` in the values map
+     * Returns the Environment that holds `name`, searching outward through enclosing
+     * environments. Throws RuntimeError if no environment has it.
      */
-    fun assign(name: String, value: Any?){
-        val env = lookup(name)
-        env.values[name] = value
-    }
-
-    /**
-     * Returns `Environment` if name is defined in environment or enclosing environments, else returns a RuntimeException
-     */
-    fun lookup(name: String) : Environment {
-        var currentEnv = this
-        while (!(currentEnv.values.containsKey(name))) {
-            if (currentEnv.enclosingEnv == null){
-                throw RuntimeException("$name not defined for environment")
-            }else{
-                currentEnv = currentEnv.enclosingEnv
-            }
+    fun lookup(name: String, token: Token? = null): Environment {
+        var env: Environment? = this
+        while (env != null) {
+            if (env.values.containsKey(name)) return env
+            env = env.enclosingEnv
         }
-        return currentEnv
+        throw RuntimeError(token, "Undefined variable '$name'.")
     }
 }

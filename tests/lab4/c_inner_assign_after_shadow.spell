@@ -1,0 +1,7 @@
+sigil x = 2
+{
+    sigil x = 30
+    x = 50
+    etch(x) // expect: 50.0
+}
+etch(x) // expect: 2.0

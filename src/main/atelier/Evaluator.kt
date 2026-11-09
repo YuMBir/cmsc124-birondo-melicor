@@ -18,8 +18,7 @@ class Evaluator {
         is Arguments -> evalArguments(node)
         is UnaryOp -> evalUnary(node)
         is Binary-> evalBinary(node)
-        is Identifier -> environment.get(node.getName())
-        //not implemented as of yet which are Identifier, Block, and etc.
+        is Identifier -> environment.get(node.getName(), node.token) //added node.token to get the line number for error reporting
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
     fun evaluateProgram(program: Program): List<Any?> {
@@ -27,8 +26,8 @@ class Evaluator {
         for (stmt in program.getStatements()) {
             try {
                 when (stmt) {
-                    is ExprStmt -> values.add(evaluate(stmt.expr))  // Lab 3 behavior: keep the value
-                    else -> execute(stmt)                            // etch, etc.: run for effect, no value collected
+                    is ExprStmt -> values.add(evaluate(stmt.expr)) 
+                    else -> execute(stmt)                          
                 }
             } catch (e: RuntimeError) {
                 System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
@@ -42,22 +41,30 @@ class Evaluator {
         return when (node.operator.getType()) {
             TokenType.MINUS -> -checkNumberOperand(node.operator, right) // throws if not a number
             TokenType.BANG -> !isTruthy(right)
-            //the ! is not yet implemented
             else -> throw RuntimeError(node.operator, "Unsupported unary operator.")
         }
     }
     private fun evalBinary(node: Binary): Any {
+        val op = node.operator
+
+        // Examples:  false and (1 / 0)  ->  false   (right side never runs)
+       //                      true or nope       ->  true    (right side never runs)
+        if (op.getType() == TokenType.AND) {
+            return isTruthy(evaluate(node.left)) && isTruthy(evaluate(node.right))
+        }
+        if (op.getType() == TokenType.OR) {
+            return isTruthy(evaluate(node.left)) || isTruthy(evaluate(node.right))
+        }
+
         //from left to right
         val left = evaluate(node.left)
         val right = evaluate(node.right)
-        val op = node.operator
         return when (op.getType()){
             TokenType.PLUS -> when {
                 left is Double && right is Double -> left + right
                 left is String && right is String -> left + right
                 left is String || right is String -> left.toString() + right.toString()
                 else -> throw RuntimeError(op, "Operands must be two numbers or two strings.")
-                
             }
             TokenType.MINUS -> {
                 val (l,r) = checkNumberOperands(op, left, right)
@@ -88,19 +95,8 @@ class Evaluator {
                 val (l,r) = checkNumberOperands(op, left, right)
                 l <= r
             }
-            TokenType.AND ->{
-                val l = evaluate(node.left)
-                return if (!isTruthy(l)) false else isTruthy(evaluate(node.right))
-            }
-            TokenType.OR -> {
-                val l = evaluate(node.left)
-                return if (isTruthy(l)) true else isTruthy(evaluate(node.right))
-
-            }
             TokenType.EQUAL_EQUAL -> isEqual(left, right)
             TokenType.NOT_EQUAL -> !isEqual(left,right)
-            
-            
             else -> throw RuntimeError(op, "Unsupported operator.")
         }
     }
@@ -131,10 +127,16 @@ class Evaluator {
         else -> true
     }
 
+    // Plain ./run file, stop at the first runtime error. Main then exits with exitStatus (70).
     fun executeProgram(program: Program) {
-        val statements = program.getStatements()
-        for (statement in statements){
-            execute(statement)
+        for (statement in program.getStatements()) {
+            try {
+                execute(statement)
+            } catch (e: RuntimeError) {
+                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
+                exitStatus = 70
+                return
+            }
         }
     }
     fun executeBlock(block: Block, blockEnv: Environment) {
@@ -146,31 +148,31 @@ class Evaluator {
                 execute(statement)
             }
         }finally {
-            this.environment = prevEnv
+            this.environment = prevEnv // restore even when a statement throws, so the REPL stays usable
         }
     }
 
     fun execute(stmt: Stmt){
         when (stmt){
-            is Block -> executeBlock(stmt, this.environment)
+            is Block -> executeBlock(stmt, Environment(this.environment)) //new scope
+            is ExprStmt -> evaluate(stmt.expr) //evaluate the expression and discard the value
             is Etch -> {
                 val value = evaluate(stmt.getArgs())
                 System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
             }
             is Sigil -> {
-                if (stmt.getExpr() == null){
-                    environment.define(stmt.getName())
-                }
-                else{
-                    environment.define(stmt.getName(), evaluate(stmt.getExpr()!!))
+                val init = stmt.getExpr()
+                if (init == null){
+                    environment.define(stmt.getToken())
+                }else{
+                    // initializer is evaluated before define, so `sigil x = x` can't see the new x
+                    environment.define(stmt.getToken(), evaluate(init))
                 }
             }
             is Assignment -> {
-                environment.assign(stmt.getName(), evaluate(stmt.getExpr()))
+                environment.assign(stmt.getToken(), evaluate(stmt.getExpr()))
             }
-            else -> System.out.write("$stmt\n".toByteArray(StandardCharsets.UTF_8))
+            else -> throw RuntimeError(null, "Cannot execute this statement yet.") 
         }
     }
-
-
 }
