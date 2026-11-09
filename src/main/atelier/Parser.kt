@@ -49,13 +49,14 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
     fun synchronize(){
         exitStatus = 65
-        while (peek().getType() !in listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.EOF)) {
-            discard()
+        while (!isAtEnd() && peek().getType() !in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)) { //remove the EOF 
+            advance() //discard tokens until we find a semicolon or newline
+            //discard()
         }
-        if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
-            parse()
-        }
-        parse()
+        //if (match(TokenType.NEWLINE, TokenType.SEMICOLON)){
+          //  parse()
+        //}
+        //parse()
     }
 
     /**
