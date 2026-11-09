@@ -130,6 +130,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun declaration(): Stmt {
+        if (peek().getType() == TokenType.LEFT_BRACE) {
+            return block()
+        }
         if (match(TokenType.ETCH)) {
             return prntStmt()
         }
