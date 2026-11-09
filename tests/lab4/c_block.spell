@@ -3,3 +3,16 @@ sigil x = 1
     x = 5
 }
 etch(x) //expect: 5.0
+
+sigil name="Python"
+{
+    name = "Java"
+}
+etch(name) // expect: Java
+name = "Karina"
+etch(name) // expect: Karina
+sigil mask;
+{
+    mask = "505"
+    etch(mask) // expect: 505
+}
