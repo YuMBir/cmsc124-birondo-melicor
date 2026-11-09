@@ -1,15 +1,12 @@
 package atelier
 
-import java.nio.charset.StandardCharsets
-import kotlin.system.exitProcess
-
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
         System.err.println("Parser: [line $lineText] $message")
         error("ParserError")
     }
     private var exitStatus = 0
-    var trees = mutableListOf<Expr>()
+    var trees = mutableListOf<Stmt>()
     var current = 0
     fun getExitStatus(): Int {
         return exitStatus
@@ -26,6 +23,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun parse(): Program{
+        if(isAtEnd()){
+            exitStatus = 65 //for empty programs
+        }
         while (!isAtEnd()) {
             try{
                 //skip blank lines and empty statements
@@ -89,7 +89,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     /**
-     * Advances to next token.
+     * Advances to next token and returns.
      * Returns error if token type is incorrect.
      */
     fun consume(vararg type: TokenType): Token{
@@ -116,19 +116,66 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     fun isAtEnd() = peek().getType() == TokenType.EOF
 
-    fun highest(): Expr{
-        return arguments()
+    fun highest(): Stmt{
+        return declaration()
     }
 
+    fun block(): Stmt{
+        val statements = mutableListOf<Stmt>()
+        consume(TokenType.LEFT_BRACE)
+        while (peek().getType() != TokenType.RIGHT_BRACE){
+            statements.add(declaration())
+        }
+        return Block(statements)
+    }
+
+    fun declaration(): Stmt {
+        if (match(TokenType.ETCH)) {
+            return prntStmt()
+        }
+        if (match(TokenType.SIGIL)){
+            return varDecl()
+        }
+        if (match(TokenType.IDENTIFIER)){
+            return assignment()
+        }
+        // default
+        return ExprStmt(arguments())
+    }
+    fun varDecl(): Stmt {
+        val name = consume(TokenType.IDENTIFIER).getLexeme() //name
+        if(peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)){
+            //declaration without assignment
+            return Sigil(name)
+        }else{
+            consume(TokenType.EQUAL)
+            val value = topExpr()
+            return Sigil(name, value)
+        }
+
+    }
+    fun assignment(): Stmt {
+        val name = previous().getLexeme() //name
+        consume(TokenType.EQUAL)
+        val value = topExpr()
+        return Assignment(name, value)
+    }
+
+    fun prntStmt(): Stmt{
+        consume(TokenType.LEFT_PAREN)
+        val value = topExpr()
+        consume(TokenType.RIGHT_PAREN)
+        return Etch(value)
+    }
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
-        args.add(firstArg())
+        args.add(topExpr())
         while (match(TokenType.COMMA)){
-            args.add(firstArg())
+            args.add(topExpr())
         }
         return Arguments(args)
     }
-    fun firstArg(): Expr{
+    fun topExpr(): Expr{
         return logicOr() //highest precedence for arguments here
     }
     fun logicOr(): Expr{

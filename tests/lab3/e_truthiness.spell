@@ -10,4 +10,3 @@
 !!"" // expect: false
 !!null // expect: false
 null // expect: null
-!identifier // expect runtime error: Variable is not supported yet.

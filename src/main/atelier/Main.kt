@@ -33,12 +33,12 @@ fun main(args: Array<String>) {
 }
 
 //main controller
-fun run(source: String, mode: String = "--print") {
+fun run(source: String, mode: String = "--exec") {
     val atelierScanner = Scanner(source)
     atelierScanner.tokenize()
     val tokens = atelierScanner.getTokenList()
     when (mode) {
-        "--print" -> atelierScanner.printCode() //default mode
+        "--print" -> atelierScanner.printCode()
         "--tokenize" -> atelierScanner.printTokens()
         "--parse" -> {
             val atelierParser = Parser(tokens)
@@ -60,6 +60,16 @@ fun run(source: String, mode: String = "--print") {
             if (atelierEval.getExitStatus() != 0) exitProcess(atelierEval.getExitStatus())
 
         }
+        "--exec" -> {
+            if (atelierScanner.hadError) exitProcess(65) // Static errors first, it will reject before running anything (exit 65).
+            val atelierParser = Parser(tokens)
+            val ast = atelierParser.parse()
+            // parser sets exitStatus to 65 on a syntax error, so reject before evaluating
+            if (atelierParser.getExitStatus() != 0) exitProcess(atelierParser.getExitStatus())  // 65
+            val atelierEval = Evaluator()
+            atelierEval.executeProgram(ast)
+        }
+
         else -> fail("invalid flag")
     }
     if (atelierScanner.hadError) exitProcess(65) //placed this after when expression, to print the token statements instead of just returning error statements

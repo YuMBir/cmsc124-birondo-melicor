@@ -1,6 +1,6 @@
 package atelier
 
-import kotlin.system.exitProcess
+import java.nio.charset.StandardCharsets
 
 /*thrown when a valid program hits a bad value at runtime, an example would be negating a string
 it also carries the token so Main.kt can report the line number.
@@ -8,6 +8,7 @@ token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
     private var exitStatus = 0
+    private var environment = Environment()
     fun getExitStatus(): Int {
         return exitStatus
     }
@@ -17,24 +18,23 @@ class Evaluator {
         is Arguments -> evalArguments(node)
         is UnaryOp -> evalUnary(node)
         is Binary-> evalBinary(node)
-        is Identifier -> throw RuntimeError(node.token, "Variable is not supported yet.")
+        is Identifier -> environment.get(node.getName())
         //not implemented as of yet which are Identifier, Block, and etc.
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
-    fun evaluateProgram (program: Program): List<Any?> {
-        val statements = program.getStatements()
+    fun evaluateProgram(program: Program): List<Any?> {
         val values = mutableListOf<Any?>()
-        for (node in statements){
+        for (stmt in program.getStatements()) {
             try {
-                values.add(evaluate(node))
+                when (stmt) {
+                    is ExprStmt -> values.add(evaluate(stmt.expr))  // Lab 3 behavior: keep the value
+                    else -> execute(stmt)                            // etch, etc.: run for effect, no value collected
+                }
             } catch (e: RuntimeError) {
-                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}") // the one place runtime errors are caught, message to stderr, exit 70 (not 65)
+                System.err.println("[line ${e.token?.getStartLine() ?: "?"}] Runtime error: ${e.message}")
                 exitStatus = 70
             }
-
         }
-
-
         return values
     }
     private fun evalUnary(node: UnaryOp): Any {
@@ -131,11 +131,46 @@ class Evaluator {
         else -> true
     }
 
+    fun executeProgram(program: Program) {
+        val statements = program.getStatements()
+        for (statement in statements){
+            execute(statement)
+        }
+    }
+    fun executeBlock(block: Block, blockEnv: Environment) {
+        val statements = block.getStatements()
+        val prevEnv = this.environment
+        try{
+            this.environment = blockEnv
+            for (statement in statements){
+                execute(statement)
+            }
+        }finally {
+            this.environment = prevEnv
+        }
+    }
 
-
-    
-
-
+    fun execute(stmt: Stmt){
+        when (stmt){
+            is Block -> executeBlock(stmt, this.environment)
+            is Etch -> {
+                val value = evaluate(stmt.getArgs())
+                System.out.write("$value\n".toByteArray(StandardCharsets.UTF_8))
+            }
+            is Sigil -> {
+                if (stmt.getExpr() == null){
+                    environment.define(stmt.getName())
+                }
+                else{
+                    environment.define(stmt.getName(), evaluate(stmt.getExpr()!!))
+                }
+            }
+            is Assignment -> {
+                environment.assign(stmt.getName(), evaluate(stmt.getExpr()))
+            }
+            else -> System.out.write("$stmt\n".toByteArray(StandardCharsets.UTF_8))
+        }
+    }
 
 
 }

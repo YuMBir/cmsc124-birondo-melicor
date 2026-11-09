@@ -1,0 +1,4 @@
+etch("Hello, world!") // expect: Hello, world!
+etch(2 + 3) // expect: 5.0
+etch(9)  // expect: 9.0
+etch(null) // expect: null
