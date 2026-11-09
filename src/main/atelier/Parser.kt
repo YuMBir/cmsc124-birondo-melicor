@@ -168,7 +168,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
 
     }
     fun assignment(): Stmt {
-        val nameToken = previous() //keep the Token
+        val nameToken = consume(TokenType.IDENTIFIER) //conwsume the identifier and keep the Token for error reporting
         consume(TokenType.EQUAL)
         val value = topExpr()
         return Assignment(nameToken, value)
