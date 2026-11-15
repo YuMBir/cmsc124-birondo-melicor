@@ -58,7 +58,7 @@ class Scanner(private var source: String = "") {
         val text = source.substring(start,current)
         tokens.add(Token(type,text,literal, startLine, endLine))// replace tokenLine with startLine and endLine
     }
-    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' || c =='-'
+    private fun isIdentifierAllowedChar(c: Char): Boolean = c in 'A'..'Z' || c in 'a'..'z' || c == '_' 
     private fun identifier() {
         while (isIdentifierAllowedChar(peek()) || peek().isLetterOrDigit()) advance() //looks through whole identifier
         val text = source.substring(start, current) //identifier text
