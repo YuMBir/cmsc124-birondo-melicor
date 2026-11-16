@@ -1,0 +1,1 @@
+sigil x 5 // expect error: Expected '=' or end of statement after variable name in declaration. 
