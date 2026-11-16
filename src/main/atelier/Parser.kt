@@ -39,6 +39,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
                         reportError(peek().getLine(),"Unexpected ';' after ';'. Expected expression after ';'")
                     }
                 }else{
+                    if (peek().getType() == TokenType.EQUAL){
+                        reportError(peek().getLine(), "Invalid assignment target.")
+                    }
                     reportError(peek().getLine(), "Unexpected ${peek().getType()}. NEWLINE, SEMICOLON, or EOF Expected after Expression")
                 }
             }catch(e:Exception){
@@ -79,7 +82,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
      */
     fun match(vararg type: TokenType): Boolean{
         if (peek().getType() in type){
-            consume(*type)
+            advance()
             return true
         }
         else{
@@ -91,13 +94,11 @@ class Parser(private var tokens: List<Token> = listOf()) {
      * Advances to next token and returns.
      * Returns error if token type is incorrect.
      */
-    fun consume(vararg type: TokenType): Token{
-        if (peek().getType() in type){
+    fun consume(type: TokenType, message: String): Token{
+        if (peek().getType() == type){
             return advance()
         }
-        else{
-            reportError(peek().getLine(),"Unexpected token: ${previous().getType()}. Expected token of type(s) ${type.contentToString()}")
-        }
+        reportError(peek().getLine(), message)
     }
 
     /**
@@ -120,22 +121,29 @@ class Parser(private var tokens: List<Token> = listOf()) {
     }
 
     fun block(): Stmt{
-        consume(TokenType.LEFT_BRACE)
+        consume(TokenType.LEFT_BRACE, "Expected '{' at start of block.")
         val statements = mutableListOf<Stmt>()
         while (true){
             while (match(TokenType.NEWLINE, TokenType.SEMICOLON)){ } //skip blank lines
             if (peek().getType() == TokenType.RIGHT_BRACE || isAtEnd()){
                 break
             }
-            statements.add(declaration())
-            if(!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE){
-                reportError(peek().getLine(), "Expected newline or ';' after statement.")
+            try{
+                statements.add(declaration())
+                if (!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE) {
+                    if (peek().getType() == TokenType.EQUAL) reportError(peek().getLine(), "Invalid assignment target.")
+                    reportError(peek().getLine(), "Expected newline or ';' after statement.")
+                }
+            } catch(e:Exception){
+                synchronize()
             }
         }
+
+
         if (isAtEnd()){
             reportError(peek().getLine(), "Expected '}' at end of block.")
         }
-        consume(TokenType.RIGHT_BRACE)
+        consume(TokenType.RIGHT_BRACE, "Expected '}' at end of block.")
         return Block(statements)
     }
 
@@ -156,28 +164,36 @@ class Parser(private var tokens: List<Token> = listOf()) {
         return ExprStmt(topExpr())
     }
     fun varDecl(): Stmt {
-        val nameToken = consume(TokenType.IDENTIFIER) //keep the Token
-        if(peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE)){
+        val nameToken = consume(TokenType.IDENTIFIER, "Expected variable name after sigil.") //keep the Token
+        val enders = listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.RIGHT_BRACE, TokenType.EOF)
+        if(peek().getType() in enders){
             //declaration without assignment
             return Sigil(nameToken)
-        }else{
-            consume(TokenType.EQUAL)
-            val value = topExpr()
-            return Sigil(nameToken, value)
         }
+        consume(TokenType.EQUAL, "Expected '=' or end of statement after variable name in declaration.")
+        if (peek().getType() in enders){
+            reportError(peek().getLine(), "Expected value after '='.")
+            //declaration without assignment
+            
+        }
+        
+        return Sigil(nameToken, topExpr())
 
     }
     fun assignment(): Stmt {
-        val nameToken = consume(TokenType.IDENTIFIER) //conwsume the identifier and keep the Token for error reporting
-        consume(TokenType.EQUAL)
+        val nameToken = consume(TokenType.IDENTIFIER, "Expected variable name in assignment.") //consume the identifier and keep the Token for error reporting
+        consume(TokenType.EQUAL, "Expected '=' in assignment.")
+        if (peek().getType() in listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.RIGHT_BRACE, TokenType.EOF)){
+            reportError(peek().getLine(), "Expected value after '=' in assignment.")
+        }
         val value = topExpr()
         return Assignment(nameToken, value)
     }
 
     fun prntStmt(): Stmt{
-        consume(TokenType.LEFT_PAREN)
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'etch'.")
         val value = topExpr()
-        consume(TokenType.RIGHT_PAREN)
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.")
         return Etch(value)
     }
     fun arguments(): Expr{
@@ -255,9 +271,9 @@ class Parser(private var tokens: List<Token> = listOf()) {
             }
         if (match(TokenType.LEFT_PAREN)){
             val node = logicOr() //was expression() then changed to logicOr() to consider <, ==, and, or.
-            consume(TokenType.RIGHT_PAREN)
+            consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.")
             return Group(node)
         }
-        reportError(peek().getLine(),"unexpected token at primary(): ${peek().getType()}")
+        reportError(peek().getLine(),"Expected expression.")
     }
 }

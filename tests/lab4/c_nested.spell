@@ -2,7 +2,11 @@ sigil a = "outer"
 {
     sigil b = "mid"
     {
+
+        
         sigil c = "inner"
         etch(a + " " + b + " " + c) // expect: outer mid inner
     }
+    etch(b) // expect: mid
 }
+etch(a) // expect: outer
