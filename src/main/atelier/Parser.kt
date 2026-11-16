@@ -128,11 +128,18 @@ class Parser(private var tokens: List<Token> = listOf()) {
             if (peek().getType() == TokenType.RIGHT_BRACE || isAtEnd()){
                 break
             }
-            statements.add(declaration())
-            if(!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE){
-                reportError(peek().getLine(), "Expected newline or ';' after statement.")
+            try{
+                statements.add(declaration())
+                if (!match(TokenType.NEWLINE, TokenType.SEMICOLON) && peek().getType() != TokenType.RIGHT_BRACE) {
+                    if (peek().getType() == TokenType.EQUAL) reportError(peek().getLine(), "Invalid assignment target.")
+                    reportError(peek().getLine(), "Expected newline or ';' after statement.")
+                }
+            } catch(e:Exception){
+                synchronize()
             }
         }
+
+
         if (isAtEnd()){
             reportError(peek().getLine(), "Expected '}' at end of block.")
         }
