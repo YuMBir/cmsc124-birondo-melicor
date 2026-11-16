@@ -2,4 +2,3 @@
     sigil x = (1 + 2 // expect error: Expected ')' after expression. 
     etch(x)
 }
-etch("after block")
