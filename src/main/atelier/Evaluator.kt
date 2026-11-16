@@ -172,6 +172,25 @@ class Evaluator {
             is Assignment -> {
                 environment.assign(stmt.getToken(), evaluate(stmt.getExpr()))
             }
+            is Scry -> {
+                val condition = stmt.getCondition()
+                val body = stmt.getBody()
+                val elseBranch = stmt.getElseBranch()
+                if (isTruthy(evaluate(condition))) {
+                    executeBlock(body, this.environment) //no new scope
+                }
+                else if (elseBranch != null){
+                    executeBlock(elseBranch, this.environment)//no new scope
+                }
+            }
+            is Whilst -> {
+                val condition = stmt.getCondition()
+                val body = stmt.getBody()
+                while(isTruthy(evaluate(condition))) {
+                    executeBlock(body, this.environment)
+                }
+
+            }
             else -> throw RuntimeError(null, "Cannot execute this statement yet.") 
         }
     }
