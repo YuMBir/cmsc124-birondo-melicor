@@ -221,8 +221,8 @@ language.]
 
 - Redeclaration in the same scope: Error
 - Uninitialized variable holds: `null`
-- Shadowing: an inner declaration hides an outer binding of the same name until its block ends; the outer binding is untouched and visible again afterward
-- Undefined name: [static error with exit 65, or runtime error with exit 70]
+- Shadowing: Block scope: an inner declaration hides an outer binding of the same name until its block ends; the outer binding is untouched and visible again afterward
+- Undefined name: runtime error with exit 70
 
 ### Control flow and functions
 
