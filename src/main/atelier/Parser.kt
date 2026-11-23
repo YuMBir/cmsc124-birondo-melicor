@@ -1,4 +1,5 @@
 package atelier
+import java.nio.charset.StandardCharsets
 
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
@@ -160,6 +161,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
         if (peek().getType() == TokenType.IDENTIFIER && peek(1).getType() == TokenType.EQUAL){
             return assignment()
         }
+        if (match(TokenType.SCRY)) {
+            return ifStmt()
+        }
+        if (match(TokenType.WHILST)){
+            return whileStmt()
+        }
         // default
         return ExprStmt(topExpr())
     }
@@ -196,6 +203,26 @@ class Parser(private var tokens: List<Token> = listOf()) {
         consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.")
         return Etch(value)
     }
+    fun ifStmt(): Stmt{
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'scry'.")
+        val condition = topExpr()
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.")
+        val thenBlock = block() as Block
+        var elseBranch:  Block? = null
+        if(match(TokenType.ELSE)){
+            elseBranch = block() as Block
+        }
+        return Scry(condition, thenBlock, elseBranch)
+    }
+
+    fun whileStmt(): Stmt{
+        consume(TokenType.LEFT_PAREN, "Expected '(' after 'whilst'.")
+        val condition = topExpr()
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.")
+        val block = block() as Block
+        return Whilst(condition, block)
+    }
+
     fun arguments(): Expr{
         var args = mutableListOf<Expr>()
         args.add(topExpr())

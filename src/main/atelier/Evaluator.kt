@@ -8,6 +8,7 @@ token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
     private var exitStatus = 0
+    var callDepth = 0
     private var environment = Environment()
     fun getExitStatus(): Int {
         return exitStatus
@@ -171,6 +172,25 @@ class Evaluator {
             }
             is Assignment -> {
                 environment.assign(stmt.getToken(), evaluate(stmt.getExpr()))
+            }
+            is Scry -> {
+                val condition = stmt.getCondition()
+                val body = stmt.getBody()
+                val elseBranch = stmt.getElseBranch()
+                if (isTruthy(evaluate(condition))) {
+                    executeBlock(body, this.environment) //no new scope
+                }
+                else if (elseBranch != null){
+                    executeBlock(elseBranch, this.environment)//no new scope
+                }
+            }
+            is Whilst -> {
+                val condition = stmt.getCondition()
+                val body = stmt.getBody()
+                while(isTruthy(evaluate(condition))) {
+                    executeBlock(body, this.environment)
+                }
+
             }
             else -> throw RuntimeError(null, "Cannot execute this statement yet.") 
         }
