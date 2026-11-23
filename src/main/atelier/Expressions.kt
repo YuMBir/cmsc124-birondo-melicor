@@ -49,5 +49,14 @@ class Identifier(val token: Token) : Expr {
     }
 }
 
+// invoke callee(arg1, arg2).
+// callee is any expression (an identifier, a group, or another call), so chained calls
+// like `invoke makeAdder(2)(3)` become a Call whose callee is itself a Call.
+// paren is the closing ')' token. It is kept so arity and not-callable errors can report a line number.
+class Call(val callee: Expr, val paren: Token, val args: List<Expr>) : Expr {
+    override fun toString(): String {
+        return "(call $callee${args.joinToString("") { " $it" }})"
+    }
+}
 
 
