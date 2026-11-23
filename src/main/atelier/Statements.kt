@@ -18,10 +18,11 @@ class ExprStmt(var expr: Expr): Stmt {
         return expr.toString()
     }
 }
-
+//fixed the parameter lists to match the changes made in lab4, with the Tokens
 class CircleFun(val name: Token, var params: List<Token>, var body: Block): Stmt{
+    // Prints the whole declaration so --parse output shows the params and the body, not just the name
     override fun toString(): String {
-        return name.getLexeme()
+        return "(circle ${name.getLexeme()} (${params.joinToString(" ") { it.getLexeme() }}) $body)"
     }
 }
 class Block(private val statements: List<Stmt>): Stmt{
@@ -82,4 +83,12 @@ class Whilst(private val condition: Expr, private val block: Block): Stmt{
     }
     fun getCondition(): Expr = condition
     fun getBody(): Block = block
+}
+// manifest [value]  (the return statement)
+// value is null for a circle without manifest
+// keyword is the `manifest` token, kept so a top-level manifest can report a line number.
+class Return(val keyword: Token, val value: Expr?) : Stmt {
+    override fun toString(): String {
+        return if (value == null) "(manifest)" else "(manifest $value)"
+    }
 }
