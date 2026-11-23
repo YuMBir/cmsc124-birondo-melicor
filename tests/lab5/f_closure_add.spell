@@ -1,0 +1,13 @@
+circle makeAdd(base){
+    circle add(x) {
+        manifest base + x
+    }
+    manifest add
+}
+sigil addTwo = invoke makeAdd(2)
+sigil addTen = invoke makeAdd(10)
+
+etch(invoke addTwo(3)) // expect: 5.0
+etch(invoke addTen(3)) // expect: 13.0
+etch(invoke addTwo(3)) // expect: 5.0
+etch(invoke makeAdd(1)(1)) // expect: 2.0

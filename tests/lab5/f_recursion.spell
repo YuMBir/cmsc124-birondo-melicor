@@ -1,0 +1,7 @@
+circle fib(n) {
+    scry (n <= 1) {
+        manifest n
+    }
+    manifest invoke fib(n - 1) + invoke fib(n - 2)
+}
+etch(invoke fib(10)) // expect: 55.0

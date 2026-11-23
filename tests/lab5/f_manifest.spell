@@ -1,0 +1,10 @@
+circle trialManifest(){
+
+    etch("This is a trial test for manifest keyword") 
+    // expect: This is a trial test for manifest keyword
+    manifest 7
+}
+etch(invoke trialManifest()) // expect: 7.0
+invoke trialManifest()  // expect: This is a trial test for manifest keyword
+
+

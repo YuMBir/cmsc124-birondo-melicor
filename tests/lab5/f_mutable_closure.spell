@@ -1,0 +1,18 @@
+circle makeCounter() {
+    sigil count = 0
+    circle increment() {
+        count = count + 1
+        manifest count
+    }
+    manifest increment
+}
+
+sigil counter = invoke makeCounter()
+etch(invoke counter()) // expect: 1.0
+etch(invoke counter()) // expect: 2.0
+etch(invoke counter()) // expect: 3.0
+
+sigil other = invoke makeCounter()
+etch(invoke other()) // expect: 1.0
+
+etch(invoke counter()) // expect: 4.0

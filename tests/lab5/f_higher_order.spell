@@ -1,0 +1,7 @@
+circle apply(f, x) {
+    manifest invoke f(x)
+}
+circle double(n) {
+    manifest n * 2
+}
+etch(invoke apply(double, 21)) // expect: 42.0

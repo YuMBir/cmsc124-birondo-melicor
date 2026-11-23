@@ -1,0 +1,5 @@
+sigil name
+circle greet(name){
+    etch("Hello, " + name + "!")
+}
+invoke greet("Alice") // expect: Hello, Alice!

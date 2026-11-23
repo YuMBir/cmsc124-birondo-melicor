@@ -1,0 +1,12 @@
+sigil x=5
+circle fiveFunction(){
+    etch(x)
+}
+whilst (x>2){
+    invoke fiveFunction()
+    x = x - 1
+}
+// expect: 5.0
+// expect: 4.0
+// expect: 3.0
+
