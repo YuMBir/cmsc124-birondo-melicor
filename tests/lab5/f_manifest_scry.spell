@@ -1,0 +1,10 @@
+circle find(n) {
+    sigil i = 0
+    whilst (true) {
+        scry (i == n) {
+            manifest i
+        }
+        i = i + 1
+    }
+}
+etch(invoke find(3)) // expect: 3.0
