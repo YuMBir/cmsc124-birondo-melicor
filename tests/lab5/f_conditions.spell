@@ -1,0 +1,26 @@
+sigil x = 5
+
+scry (x > 3) {
+    etch("big") // expect: big
+} else {
+    etch("small")
+}
+
+scry (x > 10) {
+    etch("huge")
+} else {
+    etch("not huge") // expect: not huge
+}
+
+scry (false) {
+    etch("never")
+}
+etch("after") // expect: after
+
+scry (x > 3) {
+    scry (x > 4) {
+        etch("above 4") // expect: above 4
+    } else {
+        etch("exactly 4")
+    }
+}

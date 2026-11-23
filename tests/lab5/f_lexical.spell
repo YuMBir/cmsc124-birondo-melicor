@@ -1,0 +1,9 @@
+sigil greeting = "Hello"
+circle greet() {
+    etch(greeting)
+}
+circle rude() {
+    sigil greeting = "Go away"
+    invoke greet()
+}
+invoke rude() // expect: Hello
