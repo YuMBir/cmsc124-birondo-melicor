@@ -36,10 +36,10 @@ class Sigil(private val token: Token, private val expr: Expr? = null): Stmt{
     private val name = token.getLexeme()
     fun getToken(): Token = token
     override fun toString(): String {
-        if (expr == null){
-            return "(sigil $name)"     
+        return if (expr == null){
+            "(sigil $name)"
         } else {
-            return "(sigil $name $expr)"
+            "(sigil $name $expr)"
         }
     }
     fun getName(): String = name
@@ -66,4 +66,21 @@ class Assignment(private val token: Token, private val expr: Expr): Stmt{
     override fun toString(): String {
         return "$name = $expr"
     }
+}
+
+class Scry(private val condition: Expr, private val block: Block, private val elseBranch: Block? = null): Stmt{
+    override fun toString(): String {
+        return "scry ($condition){\n$block\n}"
+    }
+    fun getCondition(): Expr = condition
+    fun getBody(): Block = block
+    fun getElseBranch(): Block? = elseBranch
+}
+
+class Whilst(private val condition: Expr, private val block: Block): Stmt{
+    override fun toString(): String {
+        return "whilst ($condition){\n$block\n}"
+    }
+    fun getCondition(): Expr = condition
+    fun getBody(): Block = block
 }

@@ -149,16 +149,23 @@ character ::= letter | digit | symbol | "_" | " " ;
 IDENTIFIER ::= letter { letter | digit | "_" | "-" } ;
 
 <block> ::= LEFT_BRACE { <declaration> ( NEWLINE | SEMICOLON ) }  RIGHT_BRACE
-<declaration> ::= <varDecl> | <statement> | <assignment> 
+<declaration> ::= <varDecl> | <statement> | <assignment> | <funDecl>
+<statement> ::= <printStmt> | <exprStmt> | <ifStmt>
 <varDecl> ::= SIGIL IDENTIFIER [ EQUAL <topExpr> ]
 <assignment> ::= IDENTIFIER EQUALS <topExpr>
 <printStmt> ::= ETCH LEFT_PAREN <topExpr> RIGHT_PAREN
-<statement> ::= <printStmt> | <exprStmt>
+<ifStmt> ::= SCRY LEFT_PAREN <topExpr> RIGHT_PAREN <block> { ELSE (<ifStmt> | <block>) ]
+<whileStmt> ::= WHILST LEFT_PAREN <topExpr> RIGHT_PAREN <block>
+<funDecl> ::= CIRCLE IDENTIFIER LEFT_PAREN <params> RIGHT_PAREN <block>
+<params> ::= IDENTIFIER { COMMA IDENTIFIER }
+<call> ::= <primary> LEFT_PAREN <arguments> RIGHT_PAREN
 <exprStmt> ::= <topExpr> 
 <topExpr> ::= <logicOr>
-<arguments> ::= <topExpr> { (COMMA) <topExpr> }
-<logicOr> ::= <logicAnd> { ( OR ) <logicAnd> }
-<logicAnd> ::= <equality> { ( AND ) <equality> }
+
+
+<arguments> ::= <topExpr> { COMMA <topExpr> }
+<logicOr> ::= <logicAnd> { OR <logicAnd> }
+<logicAnd> ::= <equality> { AND <equality> }
 <equality> ::= <relational> { ( EQUAL_EQUAL | NOT_EQUAL ) <relational> }
 <relational> ::= <expression> { ( GREATER | GREATER_EQUAL | LESS | LESS_EQUAL ) <expression> }
 <expression> ::= <addTerm>
