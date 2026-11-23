@@ -1,7 +1,6 @@
 package atelier
 import java.nio.charset.StandardCharsets
 
-import java.nio.charset.StandardCharsets
 
 class Parser(private var tokens: List<Token> = listOf()) {
     private fun reportError(lineText: String, message: String): Nothing {
