@@ -167,6 +167,12 @@ class Parser(private var tokens: List<Token> = listOf()) {
         if (match(TokenType.WHILST)){
             return whileStmt()
         }
+        if (match(TokenType.CIRCLE)) { //circle name(params) { body }
+            return circleDecl()
+        }
+        if (match(TokenType.MANIFEST)) { //manifest [value]
+            return returnStmt()
+        }
         // default
         return ExprStmt(topExpr())
     }
@@ -221,6 +227,59 @@ class Parser(private var tokens: List<Token> = listOf()) {
         consume(TokenType.RIGHT_PAREN, "Expected ')' after condition.")
         val block = block() as Block
         return Whilst(condition, block)
+    }
+
+    // circle name(param1, param2) { body }
+    // 'circle' has already been consumed by declaration().
+    fun circleDecl(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expected circle name after 'circle'.")
+        consume(TokenType.LEFT_PAREN, "Expected '(' after circle name.")
+        val params = mutableListOf<Token>()
+        if (peek().getType() != TokenType.RIGHT_PAREN) { //zero parameters is allowed
+            do {
+                //keep the Token (not just the String) so duplicate-parameter errors have a line number
+                params.add(consume(TokenType.IDENTIFIER, "Expected parameter name."))
+            } while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters.")
+        val body = block() as Block //block() consumes '{' ... '}'. The '{' must be on the same line as ')'
+        return CircleFun(name, params, body)
+    }
+
+    // manifest [value]
+    // 'manifest' has already been consumed by declaration().
+    fun returnStmt(): Stmt {
+        val keyword = previous() //the manifest token, used for error line numbers
+        val enders = listOf(TokenType.SEMICOLON, TokenType.NEWLINE, TokenType.RIGHT_BRACE, TokenType.EOF)
+        //a bare `manifest` (statement ends right away) returns null, otherwise parse the returned expression
+        val value = if (peek().getType() in enders) null else topExpr()
+        return Return(keyword, value)
+    }
+
+    // invoke callee(args) followed by zero or more extra (args) lists.
+    // The extra lists make `invoke makeAdder(2)(3)` work, the result of the first call is called again.
+    // Without `invoke` this just falls through to primary().
+    fun invokeTerm(): Expr {
+        if (!match(TokenType.INVOKE)) return primary()
+        var expr: Expr = primary() //callee: an identifier or a (parenthesized expression)
+        consume(TokenType.LEFT_PAREN, "Expected '(' after callee in invoke.")
+        expr = finishCall(expr)
+        while (match(TokenType.LEFT_PAREN)) { //chained call: wrap whatever we have so far
+            expr = finishCall(expr)
+        }
+        return expr
+    }
+
+    // Parses `args )` once the '(' has already been consumed, and builds the Call node.
+    fun finishCall(callee: Expr): Expr {
+        val args = mutableListOf<Expr>()
+        if (peek().getType() != TokenType.RIGHT_PAREN) { //zero arguments is allowed
+            do {
+                args.add(topExpr())
+            } while (match(TokenType.COMMA))
+        }
+        val paren = consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.")
+        return Call(callee, paren, args)
     }
 
     fun arguments(): Expr{
@@ -286,7 +345,7 @@ class Parser(private var tokens: List<Token> = listOf()) {
             var operand = unaryTerm()
             return UnaryOp(operator, operand)
         }
-        return primary()
+        return invokeTerm() //was primary(). invokeTerm() falls back to primary() when there is no `invoke`
     }
     fun primary(): Expr{
         //ADDED TokenType.STRING
