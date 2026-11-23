@@ -31,7 +31,8 @@ class Scanner(private var source: String = "") {
         "circle" to TokenType.CIRCLE,
         "sigil" to TokenType.SIGIL,
         "imbue" to TokenType.IMBUE,
-        "null" to TokenType.NIL
+        "null" to TokenType.NIL,
+        "invoke" to TokenType.INVOKE
     )
 
 

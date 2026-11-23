@@ -8,6 +8,9 @@ token is nullable because a few errors have no specific token. */
 class RuntimeError(val token: Token?, message: String) : RuntimeException(message)
 class Evaluator {
     private var exitStatus = 0
+    // How many circle calls are currently active. UserFunction.call increments/decrements it.
+    // 0 means we are in top-level code, where `manifest` is illegal.
+    var callDepth = 0
     private var environment = Environment()
     fun getExitStatus(): Int {
         return exitStatus
@@ -19,6 +22,7 @@ class Evaluator {
         is UnaryOp -> evalUnary(node)
         is Binary-> evalBinary(node)
         is Identifier -> environment.get(node.getName(), node.token) //added node.token to get the line number for error reporting
+        is Call -> evalCall(node) //invoke f(args)
         else -> throw RuntimeError(null, "Cannot evaluate this expression yet.")
     }
     fun evaluateProgram(program: Program): List<Any?> {
@@ -35,6 +39,27 @@ class Evaluator {
             }
         }
         return values
+    }
+    // invoke callee(args). Every call goes through here, so the not-callable check and the
+    // arity check exist in exactly one place and apply to any Callable.
+    private fun evalCall(node: Call): Any? {
+        val callee = evaluate(node.callee)
+        //arguments are evaluated left to right, in the CALLER's environment (this.environment right now)
+        val args = node.args.map { evaluate(it) }
+
+        if (callee !is Callable) {
+            throw RuntimeError(node.paren, "Can only invoke circles.")
+        }
+        if (args.size != callee.arity()) {
+            throw RuntimeError(node.paren, "Expected ${callee.arity()} arguments but got ${args.size}.")
+        }
+        try {
+            return callee.call(this, args)
+        } catch (e: StackOverflowError) {
+            //deep recursion would crash the host with a stack trace. 
+            //Turn it into a normal runtime error (exit 70) instead.
+            throw RuntimeError(node.paren, "Stack overflow: recursion too deep.")
+        }
     }
     private fun evalUnary(node: UnaryOp): Any {
         val right = evaluate(node.node)
@@ -190,6 +215,23 @@ class Evaluator {
                     executeBlock(body, this.environment)
                 }
 
+            }
+            is CircleFun -> {
+                //The closure is the CURRENT environment, where the circle is written.
+                //The name is defined in that same environment right after, so the body can find
+                //itself later through the closure. That is why recursion works.
+                environment.define(stmt.name, UserFunction(stmt, environment))
+            }
+            is Return -> {
+                //manifest is only legal inside a circle call
+                if (callDepth == 0) {
+                    throw RuntimeError(stmt.keyword, "Can't manifest outside of a circle.")
+                }
+                val valueExpr = stmt.value
+                val result = if (valueExpr == null) null else evaluate(valueExpr)
+                //not an error: ReturnSignal unwinds every frame in between (blocks, whilst, scry)
+                //until UserFunction.call catches it
+                throw ReturnSignal(result)
             }
             else -> throw RuntimeError(null, "Cannot execute this statement yet.") 
         }
